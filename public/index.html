@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Lumina Commerce - Your one-stop shop for premium products and exceptional shopping experience">
+    <meta name="keywords" content="E-commerce, Shopping, Premium Products">
+    <meta name="robots" content="index, nofollow">
+    <meta name="language" content="English">
+    <meta name="copyright" content="Lumina 2025">
+    <meta name="revisit-after" content="10 days">
+    <meta name="author" content="Lumina Commerce">
+    <meta name="theme-color" content="#121212">
+    <link rel="icon" href="/ecommerce-app/assest/images/favicon.ico" type="image/x-icon">
+    <title>LUMINA - Premium Electronics & Accessories</title>
+    <link rel="stylesheet" href="../assest/css/style.css">
+    <link rel="stylesheet" href="../assest/css/home.css">
+    <link rel="stylesheet" href="../assest/css/layout.css">
+    <link rel="stylesheet" href="../assest/css/components.css">
+</head>
+<body>
+    <div class="top-banner">
+        <p>Spring Sale: Get up to 50% off on selected items! <a href="./products.html" class="top-btn">Shop Now</a></p>
+    </div>
+
+    <nav class="home-nav">
+        <div class="home-nav-container">
+            <div class="home-logo">
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <rect width="32" height="32" rx="6" fill="#EF4444"/>
+                    <path d="M16 8L20 12L16 16L12 12L16 8Z" fill="white"/>
+                    <path d="M16 16L20 20L16 24L12 20L16 16Z" fill="white" opacity="0.7"/>
+                </svg>
+                <span>LUMINA</span>
+            </div>
+            <ul class="home-nav-links">
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="#categories">Categories</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <div class="home-nav-actions">
+                <button class="icon-btn search" aria-label="Search">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="2"/>
+                        <path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <a href="cart.html" class="icon-btn cart" aria-label="Cart">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M2 2H3.5L4.5 4M4.5 4L6.5 14H16.5L18.5 6H4.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="7" cy="18" r="1" fill="currentColor"/>
+                        <circle cx="16" cy="18" r="1" fill="currentColor"/>
+                    </svg>
+                    <span class="badge">3</span>
+                </a>
+                <button class="btn-primary" id="sign-in">Sign In</button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Discover premium electronics that transform your lifestyle
+                </h1>
+                <p class="hero-description">
+                    Experience cutting-edge technology with our curated collection of high-quality electronics and accessories designed for the modern world.
+                </p>
+                <div class="hero-cta">
+                    <a href="products.html" class="btn-primary btn-lg">Explore Products</a>
+                    <a href="#featured" class="btn-secondary btn-lg">Learn More</a>
+                </div>
+            </div>
+            <div class="hero-image">
+            </div>
+        </div>
+    </section>
+
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-value">50K+</div>
+                <div class="stat-label">Happy Customers</div>
+                <div class="stat-logo">Trusted by thousands</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">98%</div>
+                <div class="stat-label">Satisfaction Rate</div>
+                <div class="stat-logo">5-star reviews</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">24/7</div>
+                <div class="stat-label">Support Available</div>
+                <div class="stat-logo">Always here to help</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">Fast</div>
+                <div class="stat-label">Free Shipping</div>
+                <div class="stat-logo">On orders over $50</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="categories" id="categories">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-eyebrow">Categories</span>
+                <h2 class="section-title">Shop by category</h2>
+                <p class="section-description">
+                    Explore our wide range of premium electronics and accessories
+                </p>
+            </div>
+            <div class="category-grid" id="categoryGrid"></div>
+        </div>
+    </section>
+
+    <section class="featured" id="featured">
+        <div class="section-container">
+            <div class="section-header">
+                <span class="section-eyebrow">Featured</span>
+                <h2 class="section-title">Bestselling products</h2>
+                <p class="section-description">
+                    Discover our most popular items loved by customers
+                </p>
+            </div>
+            <div class="products-grid" id="featuredProducts"></div>
+            <div class="section-cta">
+                <a href="./products.html" class="btn-primary btn-lg">View All Products</a>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="features">
+        <div class="section-container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M16 4L20 12L28 14L22 20L24 28L16 24L8 28L10 20L4 14L12 12L16 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Premium Quality</h3>
+                    <p class="feature-description">
+                        All products are carefully selected and tested to ensure the highest quality standards.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <rect x="4" y="8" width="24" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+                            <path d="M4 12H28" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="12" cy="18" r="2" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Secure Payment</h3>
+                    <p class="feature-description">
+                        Shop with confidence using our secure payment gateway with multiple payment options.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <path d="M28 10L16 16L4 10M4 10L16 4L28 10M4 10V22L16 28M28 10V22L16 28" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Fast Delivery</h3>
+                    <p class="feature-description">
+                        Free shipping on orders over $50. Get your products delivered within 2-5 business days.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="newsletter">
+        <div class="newsletter-container">
+            <div class="newsletter-content">
+                <h2 class="newsletter-title">Stay updated with latest offers</h2>
+                <p class="newsletter-description">
+                    Subscribe to receive exclusive deals, product launches, and tech news.
+                </p>
+            </div>
+            <form class="newsletter-form" id="newsletterForm">
+                <input type="email" placeholder="Enter your email" required />
+                <button type="submit" class="btn-primary">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="footer-logo">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                            <rect width="32" height="32" rx="6" fill="#EF4444"/>
+                            <path d="M16 8L20 12L16 16L12 12L16 8Z" fill="white"/>
+                            <path d="M16 16L20 20L16 24L12 20L16 16Z" fill="white" opacity="0.7"/>
+                        </svg>
+                        <span>LUMINA</span>
+                    </div>
+                    <p class="footer-description">
+                        Your trusted destination for premium electronics and accessories.
+                    </p>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">Shop</h4>
+                    <ul class="footer-links">
+                        <li><a href="products.html">All Products</a></li>
+                        <li><a href="products.html">Electronics</a></li>
+                        <li><a href="products.html">Audio</a></li>
+                        <li><a href="products.html">Accessories</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">Support</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="#">Shipping Info</a></li>
+                        <li><a href="#">Returns</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4 class="footer-title">Company</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 LUMINA. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="../assest/js/main.js"></script>
+</body>
+</html>
