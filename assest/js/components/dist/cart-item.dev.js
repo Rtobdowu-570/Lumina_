@@ -91,13 +91,23 @@ function () {
     value: function remove() {
       var _this2 = this;
 
-      var element = document.querySelector("[data-id=".concat(this.id));
-      var removeBtn = element.querySelector('button[data-action="remove"]');
-      removeBtn.addEventListener('click', function () {
-        element.remove();
+      var Modal = window.Modal;
+      var modal = new Modal({
+        title: "Remove Item",
+        message: "Are you sure you want to remove this item from your cart?",
+        confirmText: "Remove",
+        cancelText: "Cancel",
+        onConfirm: function onConfirm() {
+          var element = document.querySelector("[data-id=\"".concat(_this2.id, "\"]"));
+          element.classList.add("removing");
+          setTimeout(function () {
+            element.remove();
 
-        _this2.updateCart();
+            _this2.updateCart();
+          }, 300);
+        }
       });
+      modal.show();
     }
   }, {
     key: "updateCart",

@@ -96,12 +96,22 @@ class CartItem  {
     }
 
     remove() {
-        const element = document.querySelector(`[data-id=${this.id}`)
-        const removeBtn = element.querySelector('button[data-action="remove"]')
-        removeBtn.addEventListener('click', () => {
-            element.remove()
-            this.updateCart()
-        })
+    const Modal = window.Modal 
+    const modal = new Modal({
+      title: "Remove Item",
+      message: "Are you sure you want to remove this item from your cart?",
+      confirmText: "Remove",
+      cancelText: "Cancel",
+    onConfirm: () => {
+        const element = document.querySelector(`[data-id="${this.id}"]`)
+        element.classList.add("removing")
+        setTimeout(() => {
+        element.remove()
+        this.updateCart()
+        }, 300)
+    },
+    })
+    modal.show()
     }
 
     updateCart() {
