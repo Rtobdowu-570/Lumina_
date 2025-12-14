@@ -69,6 +69,8 @@ function () {
           _this.remove();
         } else if (action === "wishlist") {
           _this.addToWishlist();
+        } else if (action === "remove") {
+          _this.remove();
         }
       });
       var quantityInput = element.querySelector('[data-action="quantity]');
@@ -86,7 +88,17 @@ function () {
     }
   }, {
     key: "remove",
-    value: function remove() {}
+    value: function remove() {
+      var _this2 = this;
+
+      var element = document.querySelector("[data-id=".concat(this.id));
+      var removeBtn = element.querySelector('button[data-action="remove"]');
+      removeBtn.addEventListener('click', function () {
+        element.remove();
+
+        _this2.updateCart();
+      });
+    }
   }, {
     key: "updateCart",
     value: function updateCart() {

@@ -77,6 +77,9 @@ class CartItem  {
         } else if (action === "wishlist") {
         this.addToWishlist()
         }
+        else if (action === "remove") {
+            this.remove()
+        }
         })
 
         const quantityInput = element.querySelector('[data-action="quantity]')
@@ -93,7 +96,12 @@ class CartItem  {
     }
 
     remove() {
-        
+        const element = document.querySelector(`[data-id=${this.id}`)
+        const removeBtn = element.querySelector('button[data-action="remove"]')
+        removeBtn.addEventListener('click', () => {
+            element.remove()
+            this.updateCart()
+        })
     }
 
     updateCart() {
