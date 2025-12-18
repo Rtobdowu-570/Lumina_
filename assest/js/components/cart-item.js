@@ -1,24 +1,24 @@
-class CartItem  {
-    constructor(data) {
-    this.id = data.id
-    this.name = data.name
-    this.category = data.category
-    this.price = data.price
-    this.originalPrice = data.originalPrice
-    this.quantity = data.quantity
-    this.image = data.image
-    this.color = data.color
-    this.style = data.style
-    this.rating = data.rating
-    this.reviews = data.reviews
-    }
+class CartItem {
+  constructor(data) {
+    this.id = data.id;
+    this.name = data.name;
+    this.category = data.category;
+    this.price = data.price;
+    this.originalPrice = data.originalPrice;
+    this.quantity = data.quantity;
+    this.image = data.image;
+    this.color = data.color;
+    this.style = data.style;
+    this.rating = data.rating;
+    this.reviews = data.reviews;
+  }
 
-    render() {
-        const item = document.createElement("div")
-        item.className = "cart-item"
-        item.dataset.id = this.id
+  render() {
+    const item = document.createElement("div");
+    item.className = "cart-item";
+    item.dataset.id = this.id;
 
-        item.innerHTML = `
+    item.innerHTML = `
         <div class="item-image" style="background: ${this.image};"></div>
             <div class="item-details">
                 <div class="item-category">${this.category}</div>
@@ -45,105 +45,104 @@ class CartItem  {
         <div class="item-price">
             <div class="price-current">$${this.price.toFixed(2)}</div>
             ${this.originalPrice ? `<div class="price-original">$${this.originalPrice.toFixed(2)}</div>` : ""}
-        </div>`
+        </div>`;
 
-        this.attachEventListeners(item)
-        return item
+    this.attachEventListeners(item);
+    return item;
+  }
+
+  generateStars() {
+    const fullStars = 5;
+    fullStars = Math.round(this.rating);
+    let output = "";
+    for (let i = 0; i <= fullStars; i++) {
+      // get percentage of star to fill
+      const starPercentage = (i / fullStars) * 100;
+      const star = starPercentage;
+      output += `<span class="star filled" style="width: ${star};">★</span>`;
     }
+    return output;
+  }
 
-    generateStars() {
-        const fullStars = 5;
-        fullStars = Math.round(this.rating);
-        let output = '';
-        for(let i = 0; i <= fullStars; i++) {
-            // get percentage of star to fill
-            const starPercentage = (i / fullStars) * 100;
-            const star = starPercentage;
-            output += 
-            `<span class="star filled" style="width: ${star};">★</span>`;
-        }
-        return output;
-    }
+  attachEventListeners(element) {
+    element.addEventListener("click", (e) => {
+      const action = e.target.dataset.action;
+      if (action === "increase") {
+        this.updateQuantity(1);
+      } else if (action === "decrease") {
+        this.updateQuantity(-1);
+      } else if (action === "remove") {
+        this.remove();
+      } else if (action === "wishlist") {
+        this.addToWishlist();
+      } else if (action === "remove") {
+        this.remove();
+      }
+    });
 
-    attachEventListeners(element) {
-        element.addEventListener('click', (e) => {
-        const action = e.target.dataset.action;
-        if (action === "increase") {
-        this.updateQuantity(1)
-        } else if (action === "decrease") {
-        this.updateQuantity(-1)
-        } else if (action === "remove") {
-        this.remove()
-        } else if (action === "wishlist") {
-        this.addToWishlist()
-        }
-        else if (action === "remove") {
-            this.remove()
-        }
-        })
+    const quantityInput = element.querySelector('[data-action="quantity]');
+    quantityInput.addEventListener("change", (e) => {
+      const newQuantity = Number.parseInt(e.target.value);
+      if (newQuantity > 0) {
+        this.quantity = newQuantity;
+        this.updateCart();
+      } else {
+        e.target.value = this.quantity;
+      }
+    });
+  }
 
-        const quantityInput = element.querySelector('[data-action="quantity]')
-        quantityInput.addEventListener('change', (e) => {
-            const newQuantity = Number.parseInt(e.target.value)
-            if(newQuantity > 0) {
-                this.quantity = newQuantity
-                this.updateCart()
-            } 
-            else{
-                e.target.value = this.quantity
-            }
-        })
-    }
-
-    remove() {
-    const Modal = window.Modal 
+  remove() {
+    const Modal = window.Modal;
     const modal = new Modal({
       title: "Remove Item",
       message: "Are you sure you want to remove this item from your cart?",
       confirmText: "Remove",
       cancelText: "Cancel",
-    onConfirm: () => {
-        const element = document.querySelector(`[data-id="${this.id}"]`)
-        element.classList.add("removing")
+      onConfirm: () => {
+        const element = document.querySelector(`[data-id="${this.id}"]`);
+        element.classList.add("removing");
         setTimeout(() => {
-        element.remove()
-        this.updateCart()
-        }, 300)
-    },
-    })
-    modal.show()
-    }
+          element.remove();
+          this.updateCart();
+        }, 300);
+      },
+    });
+    modal.show();
+  }
 
-    updateCart() {
-        window.dispatchEvent(new CustomEvent("cart-updated"))
-    }
+  updateCart() {
+    window.dispatchEvent(new CustomEvent("cart-updated"));
+  }
 
-    updateQuantity(change) {
-        this.quantity = Math.max(1, this.quantity + change)
-        const element = document.querySelector(`[data-id=${this.id}`)
-        const input = element.querySelector('input[data-action="quantity"]')
-        input.value = this.quantity;
-        this.updateCart()
-    }
+  updateQuantity(change) {
+    this.quantity = Math.max(1, this.quantity + change);
+    const element = document.querySelector(`[data-id=${this.id}`);
+    const input = element.querySelector('input[data-action="quantity"]');
+    input.value = this.quantity;
+    this.updateCart();
+  }
 
-    addToWishlist() {
-        const button = document.querySelector(`[data-id=${this.id}], wishlist-btn`)
-        button.textContent = "♥"
-        button.style.color = "#ef4444"
+  addToWishlist() {
+    const button = document.querySelector(`[data-id=${this.id}], wishlist-btn`);
+    button.textContent = "♥";
+    button.style.color = "#ef4444";
 
-        this.showToast('Added to Whitelist')
-    }
+    this.showToast("Added to Whitelist");
+  }
 
-    showToast(message) {
-    const toast = document.createElement("div")
-    toast.className = "toast"
-    toast.textContent = message
-    document.body.appendChild(toast)
+  showToast(message) {
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.textContent = message;
+    document.body.appendChild(toast);
 
-    setTimeout(() => toast.classList.add("show"), 10)
+    setTimeout(() => toast.classList.add("show"), 10);
     setTimeout(() => {
-        toast.classList.remove("show")
-        setTimeout(() => toast.remove(), 300)
-    }, 3000)
+      toast.classList.remove("show");
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
   }
 }
+
+export { CartItem };
