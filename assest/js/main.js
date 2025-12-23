@@ -32,12 +32,12 @@ const featuredProducts = [
   {
     id: 1,
     name: "Sony WH-1000XM4 Wireless Headphones",
-    category: "Audio",
+    category: "Mobile Phones & Accessories",
     price: 348.0,
     originalPrice: 399.0,
     rating: 4.8,
     reviews: 1234,
-    image: "../assest/images/products/black-wireless-charging-station.jpg",
+    image: "../assest/images/products/black-wireless-headphones-on-yellow-background.jpg",
     badge: "Sale",
   },
   {
@@ -64,7 +64,7 @@ const featuredProducts = [
   {
     id: 4,
     name: "Minimalist Leather Backpack",
-    category: "Accessories",
+    category: "Travel & Luggage",
     price: 149.0,
     originalPrice: 189.0,
     rating: 4.5,

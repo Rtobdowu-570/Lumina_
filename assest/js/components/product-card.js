@@ -81,69 +81,11 @@ class ProductCard {
     );
   }
 
-  createProduct() {
-    const product = document.createElement("div");
-    product.className = "product-section";
-
-    const productContainer = document.createElement("div");
-    productContainer.className = "product-container";
-
-    const productHeadText = document.createElement("div");
-    productHeadText.className = "product-head-text";
-
-    const heading = document.createElement("h2");
-    heading.textContent =
-      "Please all field are compulsory except from the description field";
-
-    const imageContainer = document.createElement("div");
-    imageContainer.className = "image-container";
-
-    const productImage = document.createElement("input");
-    productImage.type = "image";
-    productImage.alt = productName.textContent;
-    productImage.className = "product-Image";
-    productImage.name = productName.value;
-
-    const productInfo = document.createElement("div");
-    productInfo.className = "product-info";
-
-    const productName = document.createElememt("input");
-    productName.type = "text";
-    productName.name = productName.value;
-    productName.placeholder = "Please enter product name";
-
-    const productPrice = document.createElement("input");
-    productPrice.type = "number";
-    productPrice.name = productPrice.value;
-    productPrice.placeholder = "Please enter product price";
-
-    const productDescription = document.createElement("textarea");
-    productDescription.type = "text";
-    productDescription.name = productDescription.value;
-    productDescription.placeholder = "Please enter product description";
-
-    const productQuantity = document.createElement("input");
-    productQuantity.type = "number";
-    productQuantity.name = productQuantity.value;
-    productQuantity.placeholder = "Please enter product quantity";
-
-    const productSubmit = document.createElement("button");
-    productSubmit.type = "submit";
-    productSubmit.textContent = "Submit";
-
-    productInfo.appendChild(productName);
-    productInfo.appendChild(productDescription);
-    productInfo.appendChild(productPrice);
-    productInfo.appendChild(productQuantity);
-    productInfo.appendChild(productSubmit);
-
-    productContainer.appendChild(imageContainer);
-    productContainer.appendChild(productInfo);
-
-    product.appendChild(productContainer);
-    product.appendChild(productHeadText);
-
-    return product;
+  whitelist() {
+    this.toggleWhitelist(element);
+    window.dispatchEvent(
+      new CustomEvent("product-whitelisted", { detail: this }),
+    );
   }
 
   toggleWhitelist(element) {
