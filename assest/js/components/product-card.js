@@ -3,71 +3,87 @@ class ProductCard {
     this.id = product.id;
     this.name = product.name;
     this.price = product.price;
-    this.image = product.image;
-    this.category = product.category;
-    this.rating = product.rating;
-    this.reviews = product.reviews;
+    this.image = `http://127.0.0.1:8090/api/files/products/${product.id}/${product.image}`;
+    this.category = product.category.toLowerCase().trim().replace(/\s+/g, '-').replace(/&/g, 'and');
+    this.rating = product.rating || 0;
+    this.reviews = product.reviews || 0;
     this.badge = product.badge;
     this.description = product.description;
-    this.stock = product.stock;
-    this.isFeature = product.isFeature;
+    this.quantity = product.quantity;
+    this.isFeatured = product.isFeatured || false;
     this.isWhitelisted = product.isWhitelisted || false;
+    this.originalPrice = product.originalPrice;
   }
 
   render() {
     const card = document.createElement("div");
-    card.className = "product-card";
+    card.className = "product-cards";
     card.dataset.id = this.id;
+    card.dataset.category = this.category;
+    card.dataset.price = this.price;
 
     card.innerHTML = `
-        ${this.badge ? `<div class="product-badge">${this.badge}</div>` : ""}
-        <button class="whitelist-btn ${this.isWhitelisted ? "whitelisted" : ""}"
-        data-action='whitelist'>  ${this.isWhitelisted ? "♥" : "♡"}</button>
-        <div class="product-image" style="background: ${this.image};"></div>
-        <div class="product-info">
-            <div class="product-category">${this.category}</div>
-            <h3 class="product-name">${this.name}</h3>
-            <div class="product-rating">
+          <div class="product-card-home">
+        ${this.quantity > 0 ? `<span class="product-badge badge-sale">Sale</span>` : `<span class="product-badge badge-sold-out">Sold Out</span>`}
+
+        <button class="whitelist-btn ${this.isWhitelisted ? "active" : ""}" data-action="whitelist">
+            ${this.isWhitelisted ? "♥" : "♡"}
+        </button>
+
+        <a href="product-detail.html?id=${this.id}" class="product-image-home">
+          <img src="${this.image}" alt="${this.name}" />
+        </a>
+        <div class="product-info-home">
+          <span class="product-category-home">${this.category}</span>
+          <h3 class="product-name-home">${this.name}</h3>
+          <div class="product-rating">
                 <span class="stars">${this.generateStars()}</span>
-                <span class="rating-count">${this.rating} (${this.reviews})</span>
+                <span class="rating-count">${this.rating} (${this.reviews}) reviews</span>
             </div>
-            <div class="product-footer">
-                <div class="product-price">
-                    <span class="price-current">$${this.price.toFixed(2)}</span>
-                        ${this.originalPrice ? `<span class="price-original">$${this.originalPrice.toFixed(2)}</span>` : ""}
-                </div>
-                <button class="add-to-cart-btn" data-action="add-to-cart">
-                    <span class="cart-icon">🛒</span>
-                </button>
+          <div class="product-footer-home">
+            <div class="product-price-home">
+              <span class="price-current" data-price="${this.price}">$${this.price.toFixed(2)}</span>
+              ${this.originalPrice ? `<span class="price-original">$${this.originalPrice.toFixed(2)}</span>` : ""}
             </div>
+            <button class="btn-icon" aria-label="Add to cart" data-action="add-to-cart">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M2 2H3.5L4.5 4M4.5 4L6.5 14H16.5L18.5 6H4.5Z" stroke="currentColor" stroke-width="2"/>
+                <circle cx="7" cy="18" r="1" fill="currentColor"/>
+                <circle cx="16" cy="18" r="1" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
         </div>
-        `;
+      </div>`
+    ;
     this.attachEventListeners(card);
     return card;
   }
 
   generateStars() {
-    const fullStars = 5;
-    fullStars = Math.round(this.rating);
-    let output = "";
-    for (let i = 0; i <= fullStars; i++) {
-      // get percentage of star to fill
-      const starPercentage = (i / fullStars) * 100;
-      const star = starPercentage;
-      output += `<span class="star filled" style="width: ${star};">★</span>`;
+    let output = '';
+    for (let i = 0; i < 5; i++) {
+        if (i < Math.floor(this.rating)) {
+            output += `<span class="star filled">★</span>`;
+        } else if (i < this.rating) {
+            output += `<span class="star half">★</span>`;
+        } else {
+            output += `<span class="star">☆</span>`;
+        }
     }
     return output;
   }
 
   attachEventListeners(element) {
     element.addEventListener("click", (e) => {
-      const action = e.target.dataset.action;
+      const btn = e.target.closest('button');
+      const action = btn ? btn.dataset.action : null;
       if (action === "add-to-cart") {
-        e.preventDefault();
+        e.stopPropagation();
         this.addToCart();
       } else if (action === "whitelist") {
-        e.preventDefault();
-        this.whitelist();
+        e.stopPropagation();
+        this.whitelist(element);
       } else {
         window.location.href = `product-detail.html?id=${this.id}`;
       }
@@ -81,14 +97,17 @@ class ProductCard {
     );
   }
 
-  whitelist() {
-    this.toggleWhitelist(element);
-    window.dispatchEvent(
-      new CustomEvent("product-whitelisted", { detail: this }),
-    );
+  whitelist(cardElement) {
+   this.isWhitelisted = !this.isWhitelisted;
+    const btn = cardElement.querySelector(".whitelist-btn");
+    btn.textContent = this.isWhitelisted ? "♥" : "♡";
+    btn.classList.toggle("active", this.isWhitelisted);
+    this.showToast(this.isWhitelisted ? "Added to Whitelist" : "Removed from Whitelist");
   }
 
   toggleWhitelist(element) {
+    if (!element) return;
+    
     this.isWhitelisted = !this.isWhitelisted;
     const btn = element.querySelector(".whitelist-btn");
     btn.textContent = this.isWhitelisted ? "♥" : "♡";

@@ -1,4 +1,4 @@
-import  { pb } from './pocketbase.js';
+import  { pb , isAuthenticated } from './pocketbase.js';
 
 function alertMessage(message) {
     const toast = document.createElement("div");
@@ -10,24 +10,44 @@ function alertMessage(message) {
     }, 2000);
 }
 
-function login() {
+async function login() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    pb.collection('users').authWithPassword(email, password).then(() => {
+
+    try {
+        await pb.collection('users').authWithPassword(email, password);
         alertMessage('Login successful');
-        window.location.href = '/products.html';
-    }).catch((error) => {
+        if(isAuthenticated()) {
+            window.location.href = '/public/products.html';
+        }
+    } catch (error) {
         alertMessage(error.message);
-    });
+        console.error(error.data);
+    }
 }
 
 async function signup() {
-    const firstName = document.getElementById('firstName').value;
-    const lastName = document.getElementById('lastName').value;
-    const email = document.getElementById('signupEmail').value;
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
     const passwordConfirm = document.getElementById('confirmPassword').value;
     const name = `${firstName} ${lastName}`;
+
+    if(!email || !password || !passwordConfirm) {
+        alertMessage('Please fill in all fields');
+        return; 
+    } 
+    
+    if (password.length < 8) {
+        alertMessage('Password must be at least 8 characters');
+        return;
+    } 
+    
+    if (password !== passwordConfirm) {
+        alertMessage('Passwords do not match');
+        return;
+    }
 
     const signupData = {
         "email": email,
@@ -35,29 +55,17 @@ async function signup() {
         "name": name,
         "password": password,
         "passwordConfirm": passwordConfirm
-    }
+    };
 
-    if(!email || !password || !passwordConfirm) {
-        alertMessage('Please fill in all fields');
-        return;
-    }
-
-    if (password.length < 8) {
-        alertMessage('Password must be at least 8 characters');
-        return;
-    }
-
-    if (password !== passwordConfirm) {
-        alertMessage('Passwords do not match');
-        return;
-    }
-
-    pb.collection('users').create({ signupData }).then(() => {
+    try {
+        await pb.collection('users').create(signupData);
+        await pb.collection('users').authWithPassword(email, password);
         alertMessage('Signup successful');
-        window.location.href = '/products.html';
-    }).catch((error) => {
+        window.location.href = '/public/products.html';
+    } catch (error) {
         alertMessage(error.message);
-    });
+        console.error(error.data);
+    }
 }
 
 
@@ -90,3 +98,23 @@ async function signup() {
             e.preventDefault();
             signup();
         });
+
+const show = document.getElementById('showPassword');
+const hide = document.getElementById('hidePassword');
+const password = document.getElementById('signupPassword');
+const confirmPassword = document.getElementById('confirmPassword');
+hide.style.display = 'none';
+
+show.addEventListener('click', () => {
+  password.type = 'text';
+  confirmPassword.type = 'text';
+  hide.style.display = 'block';
+  show.style.display = 'none';
+});
+
+hide.addEventListener('click', () => {
+  password.type = 'password';
+  confirmPassword.type = 'password';
+  show.style.display = 'block';
+  hide.style.display = 'none';
+});

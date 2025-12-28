@@ -95,8 +95,19 @@ body {
 }
 
 .form-group {
+  position: relative;
   margin-bottom: 20px;
 }
+
+i {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  color: var(--secondary-foreground-color);
+  cursor: pointer;
+}
+
 
 .form-group label {
   display: block;

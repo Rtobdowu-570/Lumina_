@@ -5,8 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ProductCard = void 0;
 
-function _readOnlyError(name) { throw new Error("\"" + name + "\" is read-only"); }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -22,39 +20,43 @@ function () {
     this.id = product.id;
     this.name = product.name;
     this.price = product.price;
-    this.image = product.image;
-    this.category = product.category;
-    this.rating = product.rating;
-    this.reviews = product.reviews;
+    this.image = "http://127.0.0.1:8090/api/files/products/".concat(product.id, "/").concat(product.image);
+    this.category = product.category.toLowerCase().trim().replace(/\s+/g, '-').replace(/&/g, 'and');
+    this.rating = product.rating || 0;
+    this.reviews = product.reviews || 0;
     this.badge = product.badge;
     this.description = product.description;
-    this.stock = product.stock;
-    this.isFeature = product.isFeature;
+    this.quantity = product.quantity;
+    this.isFeatured = product.isFeatured || false;
     this.isWhitelisted = product.isWhitelisted || false;
+    this.originalPrice = product.originalPrice;
   }
 
   _createClass(ProductCard, [{
     key: "render",
     value: function render() {
       var card = document.createElement("div");
-      card.className = "product-card";
+      card.className = "product-cards";
       card.dataset.id = this.id;
-      card.innerHTML = "\n        ".concat(this.badge ? "<div class=\"product-badge\">".concat(this.badge, "</div>") : "", "\n        <button class=\"whitelist-btn ").concat(this.isWhitelisted ? "whitelisted" : "", "\"\n        data-action='whitelist'>  ").concat(this.isWhitelisted ? "♥" : "♡", "</button>\n        <div class=\"product-image\" style=\"background: ").concat(this.image, ";\"></div>\n        <div class=\"product-info\">\n            <div class=\"product-category\">").concat(this.category, "</div>\n            <h3 class=\"product-name\">").concat(this.name, "</h3>\n            <div class=\"product-rating\">\n                <span class=\"stars\">").concat(this.generateStars(), "</span>\n                <span class=\"rating-count\">").concat(this.rating, " (").concat(this.reviews, ")</span>\n            </div>\n            <div class=\"product-footer\">\n                <div class=\"product-price\">\n                    <span class=\"price-current\">$").concat(this.price.toFixed(2), "</span>\n                        ").concat(this.originalPrice ? "<span class=\"price-original\">$".concat(this.originalPrice.toFixed(2), "</span>") : "", "\n                </div>\n                <button class=\"add-to-cart-btn\" data-action=\"add-to-cart\">\n                    <span class=\"cart-icon\">\uD83D\uDED2</span>\n                </button>\n            </div>\n        </div>\n        ");
+      card.dataset.category = this.category;
+      card.dataset.price = this.price;
+      card.innerHTML = "\n          <div class=\"product-card-home\">\n        ".concat(this.quantity > 0 ? "<span class=\"product-badge badge-sale\">Sale</span>" : "<span class=\"product-badge badge-sold-out\">Sold Out</span>", "\n\n        <button class=\"whitelist-btn ").concat(this.isWhitelisted ? "active" : "", "\" data-action=\"whitelist\">\n            ").concat(this.isWhitelisted ? "♥" : "♡", "\n        </button>\n\n        <a href=\"product-detail.html?id=").concat(this.id, "\" class=\"product-image-home\">\n          <img src=\"").concat(this.image, "\" alt=\"").concat(this.name, "\" />\n        </a>\n        <div class=\"product-info-home\">\n          <span class=\"product-category-home\">").concat(this.category, "</span>\n          <h3 class=\"product-name-home\">").concat(this.name, "</h3>\n          <div class=\"product-rating\">\n                <span class=\"stars\">").concat(this.generateStars(), "</span>\n                <span class=\"rating-count\">").concat(this.rating, " (").concat(this.reviews, ") reviews</span>\n            </div>\n          <div class=\"product-footer-home\">\n            <div class=\"product-price-home\">\n              <span class=\"price-current\" data-price=\"").concat(this.price, "\">$").concat(this.price.toFixed(2), "</span>\n              ").concat(this.originalPrice ? "<span class=\"price-original\">$".concat(this.originalPrice.toFixed(2), "</span>") : "", "\n            </div>\n            <button class=\"btn-icon\" aria-label=\"Add to cart\" data-action=\"add-to-cart\">\n            <svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\">\n                <path d=\"M2 2H3.5L4.5 4M4.5 4L6.5 14H16.5L18.5 6H4.5Z\" stroke=\"currentColor\" stroke-width=\"2\"/>\n                <circle cx=\"7\" cy=\"18\" r=\"1\" fill=\"currentColor\"/>\n                <circle cx=\"16\" cy=\"18\" r=\"1\" fill=\"currentColor\"/>\n              </svg>\n            </button>\n          </div>\n        </div>\n      </div>");
       this.attachEventListeners(card);
       return card;
     }
   }, {
     key: "generateStars",
     value: function generateStars() {
-      var fullStars = 5;
-      fullStars = (_readOnlyError("fullStars"), Math.round(this.rating));
-      var output = "";
+      var output = '';
 
-      for (var i = 0; i <= fullStars; i++) {
-        // get percentage of star to fill
-        var starPercentage = i / fullStars * 100;
-        var star = starPercentage;
-        output += "<span class=\"star filled\" style=\"width: ".concat(star, ";\">\u2605</span>");
+      for (var i = 0; i < 5; i++) {
+        if (i < Math.floor(this.rating)) {
+          output += "<span class=\"star filled\">\u2605</span>";
+        } else if (i < this.rating) {
+          output += "<span class=\"star half\">\u2605</span>";
+        } else {
+          output += "<span class=\"star\">\u2606</span>";
+        }
       }
 
       return output;
@@ -65,16 +67,17 @@ function () {
       var _this = this;
 
       element.addEventListener("click", function (e) {
-        var action = e.target.dataset.action;
+        var btn = e.target.closest('button');
+        var action = btn ? btn.dataset.action : null;
 
         if (action === "add-to-cart") {
-          e.preventDefault();
+          e.stopPropagation();
 
           _this.addToCart();
         } else if (action === "whitelist") {
-          e.preventDefault();
+          e.stopPropagation();
 
-          _this.whitelist();
+          _this.whitelist(element);
         } else {
           window.location.href = "product-detail.html?id=".concat(_this.id);
         }
@@ -90,15 +93,17 @@ function () {
     }
   }, {
     key: "whitelist",
-    value: function whitelist() {
-      this.toggleWhitelist(element);
-      window.dispatchEvent(new CustomEvent("product-whitelisted", {
-        detail: this
-      }));
+    value: function whitelist(cardElement) {
+      this.isWhitelisted = !this.isWhitelisted;
+      var btn = cardElement.querySelector(".whitelist-btn");
+      btn.textContent = this.isWhitelisted ? "♥" : "♡";
+      btn.classList.toggle("active", this.isWhitelisted);
+      this.showToast(this.isWhitelisted ? "Added to Whitelist" : "Removed from Whitelist");
     }
   }, {
     key: "toggleWhitelist",
     value: function toggleWhitelist(element) {
+      if (!element) return;
       this.isWhitelisted = !this.isWhitelisted;
       var btn = element.querySelector(".whitelist-btn");
       btn.textContent = this.isWhitelisted ? "♥" : "♡";

@@ -33,7 +33,7 @@ const featuredProducts = [
     id: 1,
     name: "Sony WH-1000XM4 Wireless Headphones",
     category: "Mobile Phones & Accessories",
-    price: 348.0,
+    price: 346.0,
     originalPrice: 399.0,
     rating: 4.8,
     reviews: 1234,
@@ -57,7 +57,7 @@ const featuredProducts = [
     category: "Electronics",
     price: 1699.0,
     rating: 4.8,
-    reviews: 1028,
+    reviews: 542,
     image: "../assest/images/products/vintage-mirrorless-camera.jpg",
     badge: "New",
   },
@@ -118,7 +118,7 @@ function renderFeaturedProducts() {
                 .fill("")
                 .map(
                   (_, i) => `
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="${i < Math.floor(product.rating) ? "currentColor" : "none"}" stroke="currentColor">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="${i < Math.floor(product.rating) ? "yellow" : "none"}" stroke="currentColor">
                   <path d="M8 1L10 6L15 6.5L11.5 10L12.5 15L8 12.5L3.5 15L4.5 10L1 6.5L6 6L8 1Z"/>
                 </svg>
               `,
@@ -157,7 +157,7 @@ document.getElementById("newsletterForm").addEventListener("submit", (e) => {
 
 // Sign-in redirect
 document.getElementById('sign-in').addEventListener('click', () => {
-  window.location.href = 'register.html'
+  window.location.href = '/public/auth/auth.html'
 })
 
 // Initialize

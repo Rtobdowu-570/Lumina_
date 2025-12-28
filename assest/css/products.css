@@ -1,6 +1,4 @@
-/* Products Page Styles */
 
-/* Products Header */
 .products-header {
   display: flex;
   justify-content: space-between;
@@ -233,7 +231,7 @@
 /* Rating Stars */
 .rating-stars {
   display: flex;
-  gap: 2px;
+  gap: 5px;
 }
 
 .star {
@@ -243,6 +241,13 @@
 
 .star.filled {
   color: var(--warning-color);
+}
+
+.star.half {
+    background: linear-gradient(90deg, #ffca08 50%, #27272f 50%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .price-slider {
@@ -266,7 +271,39 @@
   appearance: none;
 }
 
-/* Track (inactive background line) */
+.whitelist-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px; /* Moves it to the right */
+    z-index: 10;
+    
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #eee;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.whitelist-btn:hover {
+    transform: scale(1.1);
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.whitelist-btn.active {
+    color: #ff4757; /* Red heart */
+    border-color: #ff4757;
+    background: #fff;
+}
+
 .price-slider input[type="range"]::-webkit-slider-runnable-track {
   height: 6px;
   background: var(--border-color);
@@ -415,7 +452,6 @@
   color: var(--secondary-foreground-color);
 }
 
-/* Products Main */
 .products-main {
   display: flex;
   flex-direction: column;
@@ -523,26 +559,6 @@
   object-fit: cover;
 }
 
-.product-badge {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.product-badge.sale {
-  background: var(--primary-color);
-  color: white;
-}
-
-.product-badge.new {
-  background: var(--accent-color);
-  color: white;
-}
 
 .product-actions {
   position: absolute;
@@ -553,7 +569,7 @@
   gap: 8px;
 }
 
-.wishlist-btn,
+
 .cart-btn {
   width: 36px;
   height: 36px;
@@ -561,25 +577,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: transparent;
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.wishlist-btn:hover,
+
 .cart-btn:hover {
   background: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.wishlist-btn.active {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-}
 
 .product-info {
   padding: 16px;

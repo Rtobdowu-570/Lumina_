@@ -414,7 +414,7 @@
 
 .product-card-home {
   position: relative;
-  background: var(--bg-secondary);
+  background: var(--card-color);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   overflow: hidden;
@@ -443,6 +443,11 @@
 
 .badge-sale, .badge-new {
   background-color: var(--destructive-color);
+}
+
+.badge-sold-out {
+  background-color: #ffffff;
+  color: var(--destructive-color);
 }
 
 
@@ -500,7 +505,7 @@
 .stars {
   display: flex;
   gap: 2px;
-  color: #fbbf24;
+  color:#facc15 ;
 }
 
 .rating-text {
@@ -529,7 +534,7 @@
 
 .price-original {
   font-size: 16px;
-  color: var(--text-secondary);
+  color: var(--warning-color);
   text-decoration: line-through;
 }
 

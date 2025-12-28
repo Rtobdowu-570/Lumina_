@@ -1,4 +1,5 @@
 import { ProductCard } from "../components/product-card.js";
+import { pb,  isAuthenticated, getCurrentUser } from "../api/pocketbase.js"
 
 class UI {
 
@@ -13,7 +14,7 @@ class UI {
     })
   } 
 
-static addProduct() {
+static async addProduct() {
 const overlay = document.createElement('div');
 overlay.className = 'product-form-overlay';
 
@@ -115,6 +116,7 @@ nameInput.id = 'productName';
 nameInput.className = 'form-input';
 nameInput.placeholder = 'Enter product name';
 nameInput.required = true;
+nameInput.name = 'name';
 
 nameGroup.append(nameLabel, nameInput);
 
@@ -171,6 +173,7 @@ const fileInput = document.createElement('input');
 fileInput.type = 'file';
 fileInput.className = 'hidden-input';
 fileInput.accept = 'image/*';
+fileInput.name = 'image';
 
 fileInput.addEventListener('change', () => {
   const file = fileInput.files[0];
@@ -197,6 +200,7 @@ const categorySelect = document.createElement('select');
 categorySelect.id = 'category';
 categorySelect.className = 'form-select';
 categorySelect.required = true;
+categorySelect.name = 'category';
 
 const defaultOption = document.createElement('option');
 defaultOption.value = '';
@@ -259,6 +263,7 @@ categories.forEach((category) => {
   const option = document.createElement('option');
   option.value = category.toLowerCase().replace(/ & /g, '-').replace(/[^a-z0-9-]/g, '');
   option.textContent = category;
+  option.dataset.category = category;
   categorySelect.appendChild(option);
 });
 
@@ -294,6 +299,7 @@ priceInput.placeholder = '0.00';
 priceInput.step = '0.01';
 priceInput.min = '0';
 priceInput.required = true;
+priceInput.name = 'price';
 
 priceWrapper.append(priceSymbol, priceInput);
 priceGroup.append(priceLabel, priceWrapper);
@@ -313,6 +319,7 @@ quantityInput.className = 'form-input';
 quantityInput.placeholder = '0';
 quantityInput.min = '0';
 quantityInput.required = true;
+quantityInput.name = 'quantity';
 
 quantityGroup.append(quantityLabel, quantityInput);
 
@@ -337,6 +344,7 @@ textarea.id = 'description';
 textarea.className = 'form-textarea';
 textarea.rows = 4;
 textarea.placeholder = 'Enter product description...';
+textarea.name = 'description';
 
 descGroup.append(descLabel, textarea);
 
@@ -348,25 +356,6 @@ submitBtn.type = 'submit';
 submitBtn.className = 'btn-submit';
 submitBtn.textContent = 'Add Product';
 
-submitBtn.addEventListener('click', () => {
-    const image = fileInput.files[0];
-    const name = nameInput.value;
-    const category = categorySelect.value;
-    const price = priceInput.value;
-    const quantity = quantityInput.value;
-    const description = textarea.value;
-
-    const formData = new FormData();
-    formData.append('image', image);
-    formData.append('name', name);
-    formData.append('category', category);
-    formData.append('price', price);
-    formData.append('quantity', quantity);
-    formData.append('description', description);
-
-    const overlay = document.querySelector('.product-form-overlay');
-    overlay.classList.remove('active');
-  });
 
 const cancelBtn = document.createElement('button');
 cancelBtn.type = 'button';
@@ -395,92 +384,207 @@ card.append(header, content);
 overlay.appendChild(card);
 
 document.body.appendChild(overlay);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = {
+        image : fileInput.files[0],
+        name : nameInput.value,
+        category : categorySelect.value,
+        price : priceInput.value,
+        quantity : quantityInput.value,
+        description : textarea.value
+      }
+
+      const formData = new FormData();
+      formData.append('image', data.image);
+      formData.append('name', data.name);
+      formData.append('category', data.category);
+      formData.append('price', data.price);
+      formData.append('quantity', data.quantity);
+      formData.append('description', data.description);
+
+      try {
+        await pb.collection('products').create(formData);
+        console.log('Product added successfully');
+      } catch(err) {
+        console.log('ERROR', err.details)
+      }
+
+      const overlay = document.querySelector('.product-form-overlay');
+      overlay.classList.remove('active');
+
+    })
+  }
+
+  static async getProducts() {
+    try {
+            const products = await pb.collection('products').getFullList();
+            const productsGrid = document.getElementById('products-grid');
+            if (!productsGrid) return;
+
+            productsGrid.innerHTML = '';
+            products.forEach(productData => {
+                const productCard = new ProductCard(productData);
+                productsGrid.appendChild(productCard.render());
+            });
+        } catch (err) {
+            console.error("Failed to load products:", err);
+        }
   }
 
   static increaseCategoryList() {
     let category = document.querySelectorAll(".category");
     const categories = Array.from(category);
 
-  categories.forEach((category,index) => {
+  categories.forEach((category, index) => {
     if(index = categories.length - 1) {
-      category.style.display = "flex";
+      category.style.display = "block";
       }
+      else {
+      category.style.display = "none";
+    }
     })
   }
 
-  static priceRange() {
+    static priceRange() {
     const rangeMin = document.querySelector('.range-min');
     const rangeMax = document.querySelector('.range-max');
     const inputMin = document.querySelector('.input-min');
     const inputMax = document.querySelector('.input-max');
-    const range = document.querySelector('.range-track');
-    const sliderMinValue = parseInt(rangeMin.min);
+    const progress = document.querySelector('.price-slider .range-track'); 
+
     const sliderMaxValue = parseInt(rangeMax.max);
-    let priceGap = 1000;
+    let priceGap = 1000; 
+
+    const setArea = () => {
+        const leftPos = (rangeMin.value / sliderMaxValue) * 100;
+        const rightPos = 100 - (rangeMax.value / sliderMaxValue) * 100;
+        
+        progress.style.left = leftPos + "%";
+        progress.style.right = rightPos + "%";
+    };
 
     function slideMin() {
-      let gap = parseInt(rangeMax.value) - parseInt(rangeMin.value);
-      if(gap <= priceGap) {
-        rangeMin.value = parseInt(rangeMax.value) - priceGap;
-      }
-      inputMin.value  = rangeMin.value;
-      setArea();
+        let minVal = parseInt(rangeMin.value);
+        let maxVal = parseInt(rangeMax.value);
+
+        if (maxVal - minVal < priceGap) {
+            rangeMin.value = maxVal - priceGap;
+        }
+        inputMin.value = rangeMin.value;
+        setArea();
+        UI.filterProducts();
     }
 
-    
     function slideMax() {
-      let gap = parseInt(rangeMax.value) - parseInt(rangeMin.value);
-      if(gap >= priceGap) {
-        rangeMax.value = parseInt(rangeMin.value) + gap - priceGap;
-      }
-      inputMax.value  = rangeMax.value;
-      setArea();
-    } 
+        let minVal = parseInt(rangeMin.value);
+        let maxVal = parseInt(rangeMax.value);
 
-    function setArea() {
-      range.style.left = (rangeMin.value / (sliderMaxValue) * 100) + "%";
-      range.style.right = 100 - (rangeMax.value / (sliderMaxValue) * 100) + "%";
+        if (maxVal - minVal < priceGap) {
+            rangeMax.value = minVal + priceGap;
+        }
+        inputMax.value = rangeMax.value;
+        setArea();
+        UI.filterProducts();
     }
 
     function setMinInput() {
-      let minInput = parseInt(inputMin.value);
-      if(minInput < sliderMinValue) {
-        inputMin.value = sliderMinValue;
-      }
-      rangeMin.value = minInput;
-      slideMin();
+        let minInput = parseInt(inputMin.value);
+        if (minInput >= (parseInt(rangeMax.value) - priceGap)) {
+            minInput = parseInt(rangeMax.value) - priceGap;
+            inputMin.value = minInput;
+        }
+        rangeMin.value = minInput;
+        setArea();
+        UI.filterProducts();
     }
+
     function setMaxInput() {
-      let maxInput = parseInt(inputMax.value);
-      if(maxInput > sliderMaxValue) {
-        inputMax.value = sliderMaxValue;
-      }
-      rangeMax.value = maxInput;
-      slideMax();
+        let maxInput = parseInt(inputMax.value);
+        if (maxInput <= (parseInt(rangeMin.value) + priceGap)) {
+            maxInput = parseInt(rangeMin.value) + priceGap;
+            inputMax.value = maxInput;
+        }
+        rangeMax.value = maxInput;
+        setArea();
+        UI.filterProducts();
     }
 
     rangeMin.addEventListener('input', slideMin);
     rangeMax.addEventListener('input', slideMax);
     inputMin.addEventListener('change', setMinInput);
     inputMax.addEventListener('change', setMaxInput);
+
+    setArea();
+}
+
+  static createProduct() {
+    if(isAuthenticated()) {
+      UI.addProduct();
+    } else {
+      window.location.href = '/public/auth/auth.html';
+    }
   }
+
+  static displayUserName() {
+
+    const user =  getCurrentUser()
+    const userName = document.querySelector('.user-name');
+
+    if (isAuthenticated()) {
+      if(user.name) {
+        userName.textContent = user.name;
+      } else {
+        userName.textContent = user.user_name;
+      }
+    }
+    else {
+      userName.textContent = "Guest";
+    }
   }
+
+  static logout() {
+    pb.authStore.clear(); 
+    window.location.href = 'index.html';
+}
+
+
+static filterProducts() {
+    const selectedCategories = Array.from(document.querySelectorAll('.category input[type="checkbox"]:checked'))
+      .map(cb => cb.closest('.category').dataset.category);
+    const minPrice = parseInt(document.querySelector('.input-min').value);
+    const maxPrice = parseInt(document.querySelector('.input-max').value);
+    const cards = document.querySelectorAll('.product-cards');
+
+    cards.forEach(card => {
+        const cardCategory = card.dataset.category;
+        const price = parseFloat(card.dataset.price);
+        const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(cardCategory);
+        const priceMatch = price >= minPrice && price <= maxPrice;
+        card.style.display = categoryMatch && priceMatch ? 'block' : 'none';
+    });
+  }
+
+}
+
   
 
 //Event Listeners
 // on page load 
 window.addEventListener("DOMContentLoaded", () => {
+  UI.getProducts();
   UI.priceRange();
   UI.reduceCategoryList();
+  UI.displayUserName();
 });
 
 // add product
 document.getElementById('add-product').addEventListener('click', (e) => { 
   e.preventDefault();
-  UI.addProduct()
+  UI.createProduct()
   const overlay = document.querySelector('.product-form-overlay');
   overlay.classList.add('active');
-  console.log("createProduct function called");
 })
 
 
@@ -499,4 +603,20 @@ showLess.addEventListener('click', () => {
   UI.reduceCategoryList();
   showMore.style.display = "block";
   showLess.style.display = "none";
+})
+
+// logout
+document.querySelector('.log-out').addEventListener('click', () => {
+  UI.logout();
+})
+
+// filter by category
+const categoryItems = document.querySelectorAll('.category');
+categoryItems.forEach(item => {
+  item.addEventListener('click', () => {
+    const category = item.dataset.category;
+    if (category) {
+      UI.filterByCategory(category);
+    }
+  })
 })
