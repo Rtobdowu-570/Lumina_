@@ -385,6 +385,8 @@ overlay.appendChild(card);
 
 document.body.appendChild(overlay);
 
+const currentUserId = pb.authStore.model.id;
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const data = {
@@ -403,6 +405,7 @@ document.body.appendChild(overlay);
       formData.append('price', data.price);
       formData.append('quantity', data.quantity);
       formData.append('description', data.description);
+      formData.append('seller', currentUserId);
 
       try {
         await pb.collection('products').create(formData);
@@ -418,19 +421,46 @@ document.body.appendChild(overlay);
   }
 
   static async getProducts() {
+
+    let page = 1;
+    let currentPage = 1;
+    const perPage = 30;
+
     try {
-            const products = await pb.collection('products').getFullList();
+            const products = await pb.collection('products').getList(page, perPage, {
+              sort: '-created',
+            });
             const productsGrid = document.getElementById('products-grid');
             if (!productsGrid) return;
 
-            productsGrid.innerHTML = '';
-            products.forEach(productData => {
+            if (currentPage === 1) productsGrid.innerHTML = '';
+            products.items.forEach(productData => {
                 const productCard = new ProductCard(productData);
                 productsGrid.appendChild(productCard.render());
+            });
+
+            const nextBtn = document.querySelector('.next');
+            if (page >= products.totalPages) {
+              nextBtn.disabled = true;
+            } else {
+              nextBtn.disabled = false;
+            }
+
+            nextBtn.addEventListener('click', async () => {
+              if (page < products.totalPages) {
+                page++;
+                currentPage++;
+                UI.getProducts();
+              }
             });
         } catch (err) {
             console.error("Failed to load products:", err);
         }
+  }
+
+  static async loadNextPage() {
+    this.currentPage++;
+    await this.getProducts(this.currentPage);
   }
 
   static increaseCategoryList() {

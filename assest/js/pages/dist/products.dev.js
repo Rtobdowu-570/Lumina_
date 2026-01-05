@@ -31,7 +31,7 @@ function () {
   }, {
     key: "addProduct",
     value: function addProduct() {
-      var overlay, card, header, headerContent, iconSvg, iconPath, iconDiv, titleDiv, title, description, closeButton, closeSvg, line1, line2, content, form, nameGroup, nameLabel, nameInput, imageGroup, imageLabelOuter, uploadContainer, uploadLabel, uploadSvg, rect, circle, polyline, uploadText, uploadSubtext, fileInput, categoryGroup, categoryLabel, categorySelect, defaultOption, categories, row, priceGroup, priceLabel, priceWrapper, priceSymbol, priceInput, quantityGroup, quantityLabel, quantityInput, descGroup, descLabel, optionalSpan, textarea, actions, submitBtn, cancelBtn;
+      var overlay, card, header, headerContent, iconSvg, iconPath, iconDiv, titleDiv, title, description, closeButton, closeSvg, line1, line2, content, form, nameGroup, nameLabel, nameInput, imageGroup, imageLabelOuter, uploadContainer, uploadLabel, uploadSvg, rect, circle, polyline, uploadText, uploadSubtext, fileInput, categoryGroup, categoryLabel, categorySelect, defaultOption, categories, row, priceGroup, priceLabel, priceWrapper, priceSymbol, priceInput, quantityGroup, quantityLabel, quantityInput, descGroup, descLabel, optionalSpan, textarea, actions, submitBtn, cancelBtn, currentUserId;
       return regeneratorRuntime.async(function addProduct$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
@@ -274,6 +274,7 @@ function () {
               card.append(header, content);
               overlay.appendChild(card);
               document.body.appendChild(overlay);
+              currentUserId = _pocketbase.pb.authStore.model.id;
               form.addEventListener('submit', function _callee(e) {
                 var data, formData, overlay;
                 return regeneratorRuntime.async(function _callee$(_context) {
@@ -296,33 +297,34 @@ function () {
                         formData.append('price', data.price);
                         formData.append('quantity', data.quantity);
                         formData.append('description', data.description);
-                        _context.prev = 9;
-                        _context.next = 12;
+                        formData.append('seller', currentUserId);
+                        _context.prev = 10;
+                        _context.next = 13;
                         return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').create(formData));
 
-                      case 12:
+                      case 13:
                         console.log('Product added successfully');
-                        _context.next = 18;
+                        _context.next = 19;
                         break;
 
-                      case 15:
-                        _context.prev = 15;
-                        _context.t0 = _context["catch"](9);
+                      case 16:
+                        _context.prev = 16;
+                        _context.t0 = _context["catch"](10);
                         console.log('ERROR', _context.t0.details);
 
-                      case 18:
+                      case 19:
                         overlay = document.querySelector('.product-form-overlay');
                         overlay.classList.remove('active');
 
-                      case 20:
+                      case 21:
                       case "end":
                         return _context.stop();
                     }
                   }
-                }, null, null, [[9, 15]]);
+                }, null, null, [[10, 16]]);
               });
 
-            case 218:
+            case 219:
             case "end":
               return _context2.stop();
           }
@@ -332,46 +334,95 @@ function () {
   }, {
     key: "getProducts",
     value: function getProducts() {
-      var products, productsGrid;
-      return regeneratorRuntime.async(function getProducts$(_context3) {
+      var page, currentPage, perPage, products, productsGrid, nextBtn;
+      return regeneratorRuntime.async(function getProducts$(_context4) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
-              _context3.prev = 0;
-              _context3.next = 3;
-              return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').getFullList());
+              page = 1;
+              currentPage = 1;
+              perPage = 30;
+              _context4.prev = 3;
+              _context4.next = 6;
+              return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').getList(page, perPage, {
+                sort: '-created'
+              }));
 
-            case 3:
-              products = _context3.sent;
+            case 6:
+              products = _context4.sent;
               productsGrid = document.getElementById('products-grid');
 
               if (productsGrid) {
-                _context3.next = 7;
+                _context4.next = 10;
                 break;
               }
 
-              return _context3.abrupt("return");
+              return _context4.abrupt("return");
 
-            case 7:
-              productsGrid.innerHTML = '';
-              products.forEach(function (productData) {
+            case 10:
+              if (currentPage === 1) productsGrid.innerHTML = '';
+              products.items.forEach(function (productData) {
                 var productCard = new _productCard.ProductCard(productData);
                 productsGrid.appendChild(productCard.render());
               });
-              _context3.next = 14;
+              nextBtn = document.querySelector('.next');
+
+              if (page >= products.totalPages) {
+                nextBtn.disabled = true;
+              } else {
+                nextBtn.disabled = false;
+              }
+
+              nextBtn.addEventListener('click', function _callee2() {
+                return regeneratorRuntime.async(function _callee2$(_context3) {
+                  while (1) {
+                    switch (_context3.prev = _context3.next) {
+                      case 0:
+                        if (page < products.totalPages) {
+                          page++;
+                          currentPage++;
+                          UI.getProducts();
+                        }
+
+                      case 1:
+                      case "end":
+                        return _context3.stop();
+                    }
+                  }
+                });
+              });
+              _context4.next = 20;
               break;
 
-            case 11:
-              _context3.prev = 11;
-              _context3.t0 = _context3["catch"](0);
-              console.error("Failed to load products:", _context3.t0);
+            case 17:
+              _context4.prev = 17;
+              _context4.t0 = _context4["catch"](3);
+              console.error("Failed to load products:", _context4.t0);
 
-            case 14:
+            case 20:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
         }
-      }, null, null, [[0, 11]]);
+      }, null, null, [[3, 17]]);
+    }
+  }, {
+    key: "loadNextPage",
+    value: function loadNextPage() {
+      return regeneratorRuntime.async(function loadNextPage$(_context5) {
+        while (1) {
+          switch (_context5.prev = _context5.next) {
+            case 0:
+              this.currentPage++;
+              _context5.next = 3;
+              return regeneratorRuntime.awrap(this.getProducts(this.currentPage));
+
+            case 3:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "increaseCategoryList",
@@ -533,29 +584,29 @@ function () {
       };
       var select = document.querySelector('.sort-select');
       if (!select) return;
-      select.addEventListener('change', function _callee2(e) {
+      select.addEventListener('change', function _callee3(e) {
         var selectedOption, query, response, productsGrid, _productsGrid, toast;
 
-        return regeneratorRuntime.async(function _callee2$(_context4) {
+        return regeneratorRuntime.async(function _callee3$(_context6) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 selectedOption = e.target.value;
                 query = pbQueries[selectedOption] || {};
-                _context4.prev = 2;
-                _context4.next = 5;
+                _context6.prev = 2;
+                _context6.next = 5;
                 return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').getList(1, 30, query));
 
               case 5:
-                response = _context4.sent;
+                response = _context6.sent;
                 productsGrid = document.getElementById('products-grid');
 
                 if (productsGrid) {
-                  _context4.next = 9;
+                  _context6.next = 9;
                   break;
                 }
 
-                return _context4.abrupt("return");
+                return _context6.abrupt("return");
 
               case 9:
                 productsGrid.innerHTML = '';
@@ -563,13 +614,13 @@ function () {
                   var productCard = new _productCard.ProductCard(productData);
                   productsGrid.appendChild(productCard.render());
                 });
-                _context4.next = 23;
+                _context6.next = 23;
                 break;
 
               case 13:
-                _context4.prev = 13;
-                _context4.t0 = _context4["catch"](2);
-                console.error("Failed to load products:", _context4.t0);
+                _context6.prev = 13;
+                _context6.t0 = _context6["catch"](2);
+                console.error("Failed to load products:", _context6.t0);
                 _productsGrid = document.getElementById('products-grid');
                 _productsGrid.innerHTML = '';
                 toast = document.createElement("div");
@@ -582,7 +633,7 @@ function () {
 
               case 23:
               case "end":
-                return _context4.stop();
+                return _context6.stop();
             }
           }
         }, null, null, [[2, 13]]);
