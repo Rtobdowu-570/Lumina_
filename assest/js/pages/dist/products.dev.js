@@ -511,6 +511,141 @@ function () {
         card.style.display = categoryMatch && priceMatch ? 'block' : 'none';
       });
     }
+  }, {
+    key: "filterProductsByPocketBase",
+    value: function filterProductsByPocketBase() {
+      var pbQueries = {
+        newest: {
+          sort: '-created'
+        },
+        ascending: {
+          sort: '+price'
+        },
+        descending: {
+          sort: '-price'
+        },
+        popular: {
+          sort: '-quantity'
+        },
+        rated: {
+          sort: '-rating'
+        }
+      };
+      var select = document.querySelector('.sort-select');
+      if (!select) return;
+      select.addEventListener('change', function _callee2(e) {
+        var selectedOption, query, response, productsGrid, _productsGrid, toast;
+
+        return regeneratorRuntime.async(function _callee2$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                selectedOption = e.target.value;
+                query = pbQueries[selectedOption] || {};
+                _context4.prev = 2;
+                _context4.next = 5;
+                return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').getList(1, 30, query));
+
+              case 5:
+                response = _context4.sent;
+                productsGrid = document.getElementById('products-grid');
+
+                if (productsGrid) {
+                  _context4.next = 9;
+                  break;
+                }
+
+                return _context4.abrupt("return");
+
+              case 9:
+                productsGrid.innerHTML = '';
+                response.items.forEach(function (productData) {
+                  var productCard = new _productCard.ProductCard(productData);
+                  productsGrid.appendChild(productCard.render());
+                });
+                _context4.next = 23;
+                break;
+
+              case 13:
+                _context4.prev = 13;
+                _context4.t0 = _context4["catch"](2);
+                console.error("Failed to load products:", _context4.t0);
+                _productsGrid = document.getElementById('products-grid');
+                _productsGrid.innerHTML = '';
+                toast = document.createElement("div");
+                toast.className = "toast show";
+                toast.innerHTML = "Error loading products. Please try again later.";
+                document.body.appendChild(toast);
+                setTimeout(function () {
+                  toast.remove();
+                }, 2000);
+
+              case 23:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, null, null, [[2, 13]]);
+      });
+    }
+  }, {
+    key: "filterByRating",
+    value: function filterByRating(rating) {
+      var min = parseFloat(rating);
+      var cards = document.querySelectorAll('.product-cards');
+
+      if (Number.isNaN(min)) {
+        cards.forEach(function (card) {
+          return card.style.display = '';
+        });
+        return;
+      }
+
+      cards.forEach(function (card) {
+        var cardRating = parseFloat(card.dataset.rating) || 0;
+
+        if (cardRating >= min) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  }, {
+    key: "resetFilters",
+    value: function resetFilters() {
+      var cards = document.querySelectorAll('.product-cards');
+      var checkboxes = document.querySelectorAll('.category input[type="checkbox"]');
+      checkboxes.forEach(function (checkbox) {
+        checkbox.checked = false;
+      });
+      document.querySelector('.input-min').value = document.querySelector('.range-min').min;
+      document.querySelector('.input-max').value = document.querySelector('.range-max').max;
+      document.querySelector('.range-min').value = document.querySelector('.range-min').min;
+      document.querySelector('.range-max').value = document.querySelector('.range-max').max;
+      var progress = document.querySelector('.price-slider .range-track');
+      progress.style.left = "0%";
+      progress.style.right = "0%";
+      cards.forEach(function (card) {
+        card.style.display = 'block';
+      });
+    } // search
+
+  }, {
+    key: "searchProducts",
+    value: function searchProducts(query) {
+      var cards = document.querySelectorAll('.product-cards');
+      var lowerQuery = query.toLowerCase();
+      cards.forEach(function (card) {
+        var name = card.dataset.name.toLowerCase();
+
+        if (name.includes(lowerQuery)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
   }]);
 
   return UI;
@@ -548,15 +683,31 @@ showLess.addEventListener('click', function () {
 
 document.querySelector('.log-out').addEventListener('click', function () {
   UI.logout();
-}); // filter by category
+}); // reset filters
 
-var categoryItems = document.querySelectorAll('.category');
-categoryItems.forEach(function (item) {
-  item.addEventListener('click', function () {
-    var category = item.dataset.category;
+var reset = document.querySelector('.reset-btn');
+reset.addEventListener('click', function () {
+  UI.resetFilters();
+}); // search products
 
-    if (category) {
-      UI.filterByCategory(category);
+var searchInput = document.getElementById('search-input');
+searchInput.addEventListener('input', function (e) {
+  var query = e.target.value;
+  UI.searchProducts(query);
+}); // sort products
+
+UI.filterProductsByPocketBase(); //filter by rating
+
+var ratingLabels = document.querySelectorAll('.checkbox-item.rating');
+ratingLabels.forEach(function (label) {
+  var input = label.querySelector('input[type="checkbox"]');
+  input.addEventListener('change', function (e) {
+    if (e.target.checked) {
+      var ratingAttr = label.getAttribute('data-rating');
+      var rating = parseFloat(ratingAttr);
+      UI.filterByRating(rating);
+    } else {
+      UI.filterByRating(0);
     }
   });
 });

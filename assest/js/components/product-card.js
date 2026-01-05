@@ -1,5 +1,6 @@
 class ProductCard {
   constructor(product) {
+    if (!product) return;
     this.id = product.id;
     this.name = product.name;
     this.price = product.price;
@@ -21,6 +22,9 @@ class ProductCard {
     card.dataset.id = this.id;
     card.dataset.category = this.category;
     card.dataset.price = this.price;
+    card.dataset.name = this.name;
+    card.dataset.rating = this.rating;
+    card.dataset.quantity = this.quantity;
 
     card.innerHTML = `
           <div class="product-card-home">
@@ -120,7 +124,7 @@ class ProductCard {
   showToast(message) {
     const toast = document.createElement("div");
     toast.className = "toast";
-    toast.innerText = message;
+    toast.innerHTML = message;
     document.body.appendChild(toast);
     setTimeout(() => {
       toast.remove();

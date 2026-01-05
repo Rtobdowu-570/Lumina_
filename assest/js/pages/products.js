@@ -566,6 +566,100 @@ static filterProducts() {
     });
   }
 
+  static filterProductsByPocketBase() {
+    const pbQueries = {
+      newest: { sort: '-created' },
+      ascending: { sort: '+price' },
+      descending: { sort: '-price' },
+      popular: { sort: '-quantity' },
+      rated: { sort: '-rating' }
+    };
+
+    const select = document.querySelector('.sort-select');
+    if (!select) return;
+    
+    select.addEventListener('change', async (e) => {
+      const selectedOption = e.target.value;
+      const query = pbQueries[selectedOption] || {};
+
+      try{
+        const response = await pb.collection('products').getList(1, 30, query);
+        const productsGrid = document.getElementById('products-grid');
+        if (!productsGrid) return;
+
+        productsGrid.innerHTML = '';
+        response.items.forEach(productData => {
+            const productCard = new ProductCard(productData);
+            productsGrid.appendChild(productCard.render());
+        });
+
+      } catch(err) {
+        console.error("Failed to load products:", err);
+        const productsGrid = document.getElementById('products-grid');
+        productsGrid.innerHTML = '';
+        const toast = document.createElement("div");
+        toast.className = "toast show";
+        toast.innerHTML = "Error loading products. Please try again later.";
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          toast.remove();
+        }, 2000)
+      }
+  });
+}
+
+static filterByRating(rating) {
+  const min = parseFloat(rating);
+    const cards = document.querySelectorAll('.product-cards');
+    if (Number.isNaN(min)) {
+      cards.forEach(card => card.style.display = '');
+      return;
+    }
+
+    cards.forEach(card => {
+        const cardRating = parseFloat(card.dataset.rating) || 0;
+        if(cardRating >= min) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+  static resetFilters() {
+    const cards = document.querySelectorAll('.product-cards');
+    const checkboxes = document.querySelectorAll('.category input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+    });
+
+    document.querySelector('.input-min').value = document.querySelector('.range-min').min;
+    document.querySelector('.input-max').value = document.querySelector('.range-max').max;
+    document.querySelector('.range-min').value = document.querySelector('.range-min').min;
+    document.querySelector('.range-max').value = document.querySelector('.range-max').max;
+    const progress = document.querySelector('.price-slider .range-track');
+    progress.style.left = "0%";
+    progress.style.right = "0%";
+
+    cards.forEach(card => {
+        card.style.display = 'block';
+    });
+  }
+
+  // search
+  static searchProducts(query) {
+    const cards = document.querySelectorAll('.product-cards');
+    const lowerQuery = query.toLowerCase();
+
+    cards.forEach(card => {
+        const name = card.dataset.name.toLowerCase();
+        if(name.includes(lowerQuery)) {
+        card.style.display = 'block';
+    } else {
+        card.style.display = 'none';
+        }
+    })
+  }
 }
 
   
@@ -610,13 +704,33 @@ document.querySelector('.log-out').addEventListener('click', () => {
   UI.logout();
 })
 
-// filter by category
-const categoryItems = document.querySelectorAll('.category');
-categoryItems.forEach(item => {
-  item.addEventListener('click', () => {
-    const category = item.dataset.category;
-    if (category) {
-      UI.filterByCategory(category);
+// reset filters
+const reset = document.querySelector('.reset-btn');
+reset.addEventListener('click', () => {
+  UI.resetFilters();
+})
+
+// search products
+const searchInput = document.getElementById('search-input');
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value;
+  UI.searchProducts(query);
+})
+
+// sort products
+UI.filterProductsByPocketBase();
+
+//filter by rating
+const ratingLabels = document.querySelectorAll('.checkbox-item.rating');
+ratingLabels.forEach(label => {
+  const input = label.querySelector('input[type="checkbox"]');
+  input.addEventListener('change', (e) => {
+    if (e.target.checked) {
+      const ratingAttr = label.getAttribute('data-rating');
+      const rating = parseFloat(ratingAttr);
+      UI.filterByRating(rating);
+    } else {
+      UI.filterByRating(0);
     }
-  })
+  });
 })

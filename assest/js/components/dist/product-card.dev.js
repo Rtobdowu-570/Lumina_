@@ -17,6 +17,7 @@ function () {
   function ProductCard(product) {
     _classCallCheck(this, ProductCard);
 
+    if (!product) return;
     this.id = product.id;
     this.name = product.name;
     this.price = product.price;
@@ -40,6 +41,9 @@ function () {
       card.dataset.id = this.id;
       card.dataset.category = this.category;
       card.dataset.price = this.price;
+      card.dataset.name = this.name;
+      card.dataset.rating = this.rating;
+      card.dataset.quantity = this.quantity;
       card.innerHTML = "\n          <div class=\"product-card-home\">\n        ".concat(this.quantity > 0 ? "<span class=\"product-badge badge-sale\">Sale</span>" : "<span class=\"product-badge badge-sold-out\">Sold Out</span>", "\n\n        <button class=\"whitelist-btn ").concat(this.isWhitelisted ? "active" : "", "\" data-action=\"whitelist\">\n            ").concat(this.isWhitelisted ? "♥" : "♡", "\n        </button>\n\n        <a href=\"product-detail.html?id=").concat(this.id, "\" class=\"product-image-home\">\n          <img src=\"").concat(this.image, "\" alt=\"").concat(this.name, "\" />\n        </a>\n        <div class=\"product-info-home\">\n          <span class=\"product-category-home\">").concat(this.category, "</span>\n          <h3 class=\"product-name-home\">").concat(this.name, "</h3>\n          <div class=\"product-rating\">\n                <span class=\"stars\">").concat(this.generateStars(), "</span>\n                <span class=\"rating-count\">").concat(this.rating, " (").concat(this.reviews, ") reviews</span>\n            </div>\n          <div class=\"product-footer-home\">\n            <div class=\"product-price-home\">\n              <span class=\"price-current\" data-price=\"").concat(this.price, "\">$").concat(this.price.toFixed(2), "</span>\n              ").concat(this.originalPrice ? "<span class=\"price-original\">$".concat(this.originalPrice.toFixed(2), "</span>") : "", "\n            </div>\n            <button class=\"btn-icon\" aria-label=\"Add to cart\" data-action=\"add-to-cart\">\n            <svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\">\n                <path d=\"M2 2H3.5L4.5 4M4.5 4L6.5 14H16.5L18.5 6H4.5Z\" stroke=\"currentColor\" stroke-width=\"2\"/>\n                <circle cx=\"7\" cy=\"18\" r=\"1\" fill=\"currentColor\"/>\n                <circle cx=\"16\" cy=\"18\" r=\"1\" fill=\"currentColor\"/>\n              </svg>\n            </button>\n          </div>\n        </div>\n      </div>");
       this.attachEventListeners(card);
       return card;
@@ -115,7 +119,7 @@ function () {
     value: function showToast(message) {
       var toast = document.createElement("div");
       toast.className = "toast";
-      toast.innerText = message;
+      toast.innerHTML = message;
       document.body.appendChild(toast);
       setTimeout(function () {
         toast.remove();
