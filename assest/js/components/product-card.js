@@ -1,3 +1,4 @@
+import { pb } from "../api/pocketbase.js";
 class ProductCard {
   constructor(product) {
     if (!product) return;
@@ -94,11 +95,41 @@ class ProductCard {
     });
   }
 
-  addToCart() {
+  async addToCart() {
+    if(!pb.authStore.isValid) {
+      this.showToast("Please login to add items to cart");
+      window.location.href = '/auth/login.html';
+      return;
+    }
+
+    try{
+      const data = {
+            "user": pb.authStore.model.id,
+            "product": this.id,
+            "quantity": 1
+      }
+
+      const existing = await pb.collection('cart').getFirstListItem(
+            `user="${pb.authStore.model.id}" && product="${this.id}"`
+        ).catch(() => null)
+    
+
+    if(existing) {
+      await pb.collection('cart').update(existing.id, {
+                "quantity": existing.quantity + 1
+            });
+    }
+    else {
+      await pb.collection('cart').create(data);
+    }
     this.showToast("Added to cart!");
     window.dispatchEvent(
       new CustomEvent("product-added-to-cart", { detail: this }),
     );
+  }
+      catch(err){
+      console.error("Error adding to cart:", err);
+    }
   }
 
   whitelist(cardElement) {

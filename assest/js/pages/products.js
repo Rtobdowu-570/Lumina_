@@ -458,6 +458,162 @@ const currentUserId = pb.authStore.model.id;
         }
   }
 
+  static async getCategoryCount() {
+   const categories = [
+  'Travel & Luggage',
+  'Shoes & Footwear',
+  'Kitchen & Dining',
+  'Tools & Home Improvement',
+  'Musical Instruments',
+  'Arts & Crafts',
+  'Fitness Equipment',
+  'Watches',
+  'Bags & Handbags',
+  'Gardening & Outdoor Living',
+  'Video Games & Consoles',
+  'Eyewear & Sunglasses',
+  'Bedding & Bath',
+  'Camping & Hiking',
+  'Party Supplies',
+  'Appliances',
+  'Mobile Phones & Accessories',
+  'Computers & Laptops',
+  'Lighting & Fans',
+  'Men\'s Clothing',
+  'Women\'s Clothing',
+  'Kids\' Clothing',
+  'Skincare & Makeup',
+  'Vitamins & Supplements',
+  'Cycling & Bikes',
+  'Board Games & Puzzles',
+  'Movies & TV Shows',
+  'Beverages & Drinks',
+  'Pet Food & Treats',
+  'Home Storage & Organization',
+  'Baby Essentials',
+  'Fine Jewelry',
+  'Car Parts & Accessories',
+  'Stationery & School Supplies',
+  'Outdoor Power Equipment',
+  'Electronics',
+  'Fashion & Apparel',
+  'Home & Garden',
+  'Beauty & Personal Care',
+  'Health & Wellness',
+  'Sports & Outdoors',
+  'Toys & Games',
+  'Books & Media',
+  'Food & Grocery',
+  'Pet Supplies',
+  'Furniture & Decor',
+  'Baby & Kids',
+  'Jewelry & Accessories',
+  'Automotive',
+  'Office Supplies'
+];
+   const counts = {};
+
+   for(const category of categories) {
+    try{
+      const response = await pb.collection('products').getList( 1, 1, {
+        filter: `category="${category}"`
+      })
+      counts[category] = response.totalItems;
+    } catch(err) {
+      console.error("Failed to get category count:", err);
+      counts[category] = 0;
+    }
+   }
+   return counts;
+  }
+ 
+  
+  static async getCategoryCount() {
+    const categories = [
+      'Travel & Luggage',
+      'Shoes & Footwear',
+      'Kitchen & Dining',
+      'Tools & Home Improvement',
+      'Musical Instruments',
+      'Arts & Crafts',
+      'Fitness Equipment',
+      'Watches',
+      'Bags & Handbags',
+      'Gardening & Outdoor Living',
+      'Video Games & Consoles',
+      'Eyewear & Sunglasses',
+      'Bedding & Bath',
+      'Camping & Hiking',
+      'Party Supplies',
+      'Appliances',
+      'Mobile Phones & Accessories',
+      'Computers & Laptops',
+      'Lighting & Fans',
+      "Men's Clothing",
+      "Women's Clothing",
+      "Kids' Clothing",
+      'Skincare & Makeup',
+      'Vitamins & Supplements',
+      'Cycling & Bikes',
+      'Board Games & Puzzles',
+      'Movies & TV Shows',
+      'Beverages & Drinks',
+      'Pet Food & Treats',
+      'Home Storage & Organization',
+      'Baby Essentials',
+      'Fine Jewelry',
+      'Car Parts & Accessories',
+      'Stationery & School Supplies',
+      'Outdoor Power Equipment',
+      'Electronics',
+      'Fashion & Apparel',
+      'Home & Garden',
+      'Beauty & Personal Care',
+      'Health & Wellness',
+      'Sports & Outdoors',
+      'Toys & Games',
+      'Books & Media',
+      'Food & Grocery',
+      'Pet Supplies',
+      'Furniture & Decor',
+      'Baby & Kids',
+      'Jewelry & Accessories',
+      'Automotive',
+      'Office Supplies'
+    ];
+
+    const counts = {};
+
+    try {
+      const products = await pb.collection('products').getFullList();
+      products.forEach(p => {
+        const raw = p.category || '';
+        const slug = raw.toLowerCase().trim().replace(/\s+/g, '-').replace(/&/g, 'and').replace(/[^a-z0-9-]/g, '');
+        counts[slug] = (counts[slug] || 0) + 1;
+      });
+
+      // ensure all sidebar categories are present with at least 0
+      categories.forEach(c => {
+        const slug = c.toLowerCase().trim().replace(/\s+/g, '-').replace(/&/g, 'and').replace(/[^a-z0-9-]/g, '');
+        counts[slug] = counts[slug] || 0;
+      });
+
+      // update DOM counts
+      const labels = document.querySelectorAll('.checkbox-item.category');
+      labels.forEach(label => {
+        const cat = label.getAttribute('data-category');
+        const span = label.querySelector('.checkbox-count');
+        if (span) span.textContent = counts[cat] !== undefined ? counts[cat] : 0;
+      });
+
+    } catch (err) {
+      console.error('Failed to get category count:', err);
+    }
+
+    return counts;
+  }
+
+
   static async loadNextPage() {
     this.currentPage++;
     await this.getProducts(this.currentPage);
@@ -696,8 +852,9 @@ static filterByRating(rating) {
 
 //Event Listeners
 // on page load 
-window.addEventListener("DOMContentLoaded", () => {
-  UI.getProducts();
+window.addEventListener("DOMContentLoaded", async () => {
+  await UI.getProducts();
+  UI.getCategoryCount();
   UI.priceRange();
   UI.reduceCategoryList();
   UI.displayUserName();

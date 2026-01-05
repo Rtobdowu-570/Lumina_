@@ -407,19 +407,123 @@ function () {
       }, null, null, [[3, 17]]);
     }
   }, {
-    key: "loadNextPage",
-    value: function loadNextPage() {
-      return regeneratorRuntime.async(function loadNextPage$(_context5) {
+    key: "getCategoryCount",
+    value: function getCategoryCount() {
+      var categories, counts, _i, _categories, category, response;
+
+      return regeneratorRuntime.async(function getCategoryCount$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
-              this.currentPage++;
+              categories = ['Travel & Luggage', 'Shoes & Footwear', 'Kitchen & Dining', 'Tools & Home Improvement', 'Musical Instruments', 'Arts & Crafts', 'Fitness Equipment', 'Watches', 'Bags & Handbags', 'Gardening & Outdoor Living', 'Video Games & Consoles', 'Eyewear & Sunglasses', 'Bedding & Bath', 'Camping & Hiking', 'Party Supplies', 'Appliances', 'Mobile Phones & Accessories', 'Computers & Laptops', 'Lighting & Fans', 'Men\'s Clothing', 'Women\'s Clothing', 'Kids\' Clothing', 'Skincare & Makeup', 'Vitamins & Supplements', 'Cycling & Bikes', 'Board Games & Puzzles', 'Movies & TV Shows', 'Beverages & Drinks', 'Pet Food & Treats', 'Home Storage & Organization', 'Baby Essentials', 'Fine Jewelry', 'Car Parts & Accessories', 'Stationery & School Supplies', 'Outdoor Power Equipment', 'Electronics', 'Fashion & Apparel', 'Home & Garden', 'Beauty & Personal Care', 'Health & Wellness', 'Sports & Outdoors', 'Toys & Games', 'Books & Media', 'Food & Grocery', 'Pet Supplies', 'Furniture & Decor', 'Baby & Kids', 'Jewelry & Accessories', 'Automotive', 'Office Supplies'];
+              counts = {};
+              _i = 0, _categories = categories;
+
+            case 3:
+              if (!(_i < _categories.length)) {
+                _context5.next = 19;
+                break;
+              }
+
+              category = _categories[_i];
+              _context5.prev = 5;
+              _context5.next = 8;
+              return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').getList(1, 1, {
+                filter: "category=\"".concat(category, "\"")
+              }));
+
+            case 8:
+              response = _context5.sent;
+              counts[category] = response.totalItems;
+              _context5.next = 16;
+              break;
+
+            case 12:
+              _context5.prev = 12;
+              _context5.t0 = _context5["catch"](5);
+              console.error("Failed to get category count:", _context5.t0);
+              counts[category] = 0;
+
+            case 16:
+              _i++;
               _context5.next = 3;
+              break;
+
+            case 19:
+              return _context5.abrupt("return", counts);
+
+            case 20:
+            case "end":
+              return _context5.stop();
+          }
+        }
+      }, null, null, [[5, 12]]);
+    }
+  }, {
+    key: "getCategoryCount",
+    value: function getCategoryCount() {
+      var categories, counts, products, labels;
+      return regeneratorRuntime.async(function getCategoryCount$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              categories = ['Travel & Luggage', 'Shoes & Footwear', 'Kitchen & Dining', 'Tools & Home Improvement', 'Musical Instruments', 'Arts & Crafts', 'Fitness Equipment', 'Watches', 'Bags & Handbags', 'Gardening & Outdoor Living', 'Video Games & Consoles', 'Eyewear & Sunglasses', 'Bedding & Bath', 'Camping & Hiking', 'Party Supplies', 'Appliances', 'Mobile Phones & Accessories', 'Computers & Laptops', 'Lighting & Fans', "Men's Clothing", "Women's Clothing", "Kids' Clothing", 'Skincare & Makeup', 'Vitamins & Supplements', 'Cycling & Bikes', 'Board Games & Puzzles', 'Movies & TV Shows', 'Beverages & Drinks', 'Pet Food & Treats', 'Home Storage & Organization', 'Baby Essentials', 'Fine Jewelry', 'Car Parts & Accessories', 'Stationery & School Supplies', 'Outdoor Power Equipment', 'Electronics', 'Fashion & Apparel', 'Home & Garden', 'Beauty & Personal Care', 'Health & Wellness', 'Sports & Outdoors', 'Toys & Games', 'Books & Media', 'Food & Grocery', 'Pet Supplies', 'Furniture & Decor', 'Baby & Kids', 'Jewelry & Accessories', 'Automotive', 'Office Supplies'];
+              counts = {};
+              _context6.prev = 2;
+              _context6.next = 5;
+              return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').getFullList());
+
+            case 5:
+              products = _context6.sent;
+              products.forEach(function (p) {
+                var raw = p.category || '';
+                var slug = raw.toLowerCase().trim().replace(/\s+/g, '-').replace(/&/g, 'and').replace(/[^a-z0-9-]/g, '');
+                counts[slug] = (counts[slug] || 0) + 1;
+              }); // ensure all sidebar categories are present with at least 0
+
+              categories.forEach(function (c) {
+                var slug = c.toLowerCase().trim().replace(/\s+/g, '-').replace(/&/g, 'and').replace(/[^a-z0-9-]/g, '');
+                counts[slug] = counts[slug] || 0;
+              }); // update DOM counts
+
+              labels = document.querySelectorAll('.checkbox-item.category');
+              labels.forEach(function (label) {
+                var cat = label.getAttribute('data-category');
+                var span = label.querySelector('.checkbox-count');
+                if (span) span.textContent = counts[cat] !== undefined ? counts[cat] : 0;
+              });
+              _context6.next = 15;
+              break;
+
+            case 12:
+              _context6.prev = 12;
+              _context6.t0 = _context6["catch"](2);
+              console.error('Failed to get category count:', _context6.t0);
+
+            case 15:
+              return _context6.abrupt("return", counts);
+
+            case 16:
+            case "end":
+              return _context6.stop();
+          }
+        }
+      }, null, null, [[2, 12]]);
+    }
+  }, {
+    key: "loadNextPage",
+    value: function loadNextPage() {
+      return regeneratorRuntime.async(function loadNextPage$(_context7) {
+        while (1) {
+          switch (_context7.prev = _context7.next) {
+            case 0:
+              this.currentPage++;
+              _context7.next = 3;
               return regeneratorRuntime.awrap(this.getProducts(this.currentPage));
 
             case 3:
             case "end":
-              return _context5.stop();
+              return _context7.stop();
           }
         }
       }, null, this);
@@ -587,26 +691,26 @@ function () {
       select.addEventListener('change', function _callee3(e) {
         var selectedOption, query, response, productsGrid, _productsGrid, toast;
 
-        return regeneratorRuntime.async(function _callee3$(_context6) {
+        return regeneratorRuntime.async(function _callee3$(_context8) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 selectedOption = e.target.value;
                 query = pbQueries[selectedOption] || {};
-                _context6.prev = 2;
-                _context6.next = 5;
+                _context8.prev = 2;
+                _context8.next = 5;
                 return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').getList(1, 30, query));
 
               case 5:
-                response = _context6.sent;
+                response = _context8.sent;
                 productsGrid = document.getElementById('products-grid');
 
                 if (productsGrid) {
-                  _context6.next = 9;
+                  _context8.next = 9;
                   break;
                 }
 
-                return _context6.abrupt("return");
+                return _context8.abrupt("return");
 
               case 9:
                 productsGrid.innerHTML = '';
@@ -614,13 +718,13 @@ function () {
                   var productCard = new _productCard.ProductCard(productData);
                   productsGrid.appendChild(productCard.render());
                 });
-                _context6.next = 23;
+                _context8.next = 23;
                 break;
 
               case 13:
-                _context6.prev = 13;
-                _context6.t0 = _context6["catch"](2);
-                console.error("Failed to load products:", _context6.t0);
+                _context8.prev = 13;
+                _context8.t0 = _context8["catch"](2);
+                console.error("Failed to load products:", _context8.t0);
                 _productsGrid = document.getElementById('products-grid');
                 _productsGrid.innerHTML = '';
                 toast = document.createElement("div");
@@ -633,7 +737,7 @@ function () {
 
               case 23:
               case "end":
-                return _context6.stop();
+                return _context8.stop();
             }
           }
         }, null, null, [[2, 13]]);
@@ -704,11 +808,26 @@ function () {
 // on page load 
 
 
-window.addEventListener("DOMContentLoaded", function () {
-  UI.getProducts();
-  UI.priceRange();
-  UI.reduceCategoryList();
-  UI.displayUserName();
+window.addEventListener("DOMContentLoaded", function _callee4() {
+  return regeneratorRuntime.async(function _callee4$(_context9) {
+    while (1) {
+      switch (_context9.prev = _context9.next) {
+        case 0:
+          _context9.next = 2;
+          return regeneratorRuntime.awrap(UI.getProducts());
+
+        case 2:
+          UI.getCategoryCount();
+          UI.priceRange();
+          UI.reduceCategoryList();
+          UI.displayUserName();
+
+        case 6:
+        case "end":
+          return _context9.stop();
+      }
+    }
+  });
 }); // add product
 
 document.getElementById('add-product').addEventListener('click', function (e) {

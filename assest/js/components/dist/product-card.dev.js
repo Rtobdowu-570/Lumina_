@@ -5,6 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.ProductCard = void 0;
 
+var _pocketbase = require("../api/pocketbase.js");
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -90,10 +92,72 @@ function () {
   }, {
     key: "addToCart",
     value: function addToCart() {
-      this.showToast("Added to cart!");
-      window.dispatchEvent(new CustomEvent("product-added-to-cart", {
-        detail: this
-      }));
+      var data, existing;
+      return regeneratorRuntime.async(function addToCart$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              if (_pocketbase.pb.authStore.isValid) {
+                _context.next = 4;
+                break;
+              }
+
+              this.showToast("Please login to add items to cart");
+              window.location.href = '/auth/login.html';
+              return _context.abrupt("return");
+
+            case 4:
+              _context.prev = 4;
+              data = {
+                "user": _pocketbase.pb.authStore.model.id,
+                "product": this.id,
+                "quantity": 1
+              };
+              _context.next = 8;
+              return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').getFirstListItem("user=\"".concat(_pocketbase.pb.authStore.model.id, "\" && product=\"").concat(this.id, "\""))["catch"](function () {
+                return null;
+              }));
+
+            case 8:
+              existing = _context.sent;
+
+              if (!existing) {
+                _context.next = 14;
+                break;
+              }
+
+              _context.next = 12;
+              return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').update(existing.id, {
+                "quantity": existing.quantity + 1
+              }));
+
+            case 12:
+              _context.next = 16;
+              break;
+
+            case 14:
+              _context.next = 16;
+              return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').create(data));
+
+            case 16:
+              this.showToast("Added to cart!");
+              window.dispatchEvent(new CustomEvent("product-added-to-cart", {
+                detail: this
+              }));
+              _context.next = 23;
+              break;
+
+            case 20:
+              _context.prev = 20;
+              _context.t0 = _context["catch"](4);
+              console.error("Error adding to cart:", _context.t0);
+
+            case 23:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this, [[4, 20]]);
     }
   }, {
     key: "whitelist",
