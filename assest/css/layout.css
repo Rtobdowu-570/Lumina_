@@ -71,6 +71,7 @@
   gap: 12px;
   padding: 16px 20px;
   border-top: 1px solid var(--border-color);
+  margin-top: 24rem;
 }
 
 .user-avatar {

@@ -1,4 +1,8 @@
-const pb = new PocketBase('http://127.0.0.1:8090'); 
+const pb = new PocketBase('http://127.0.0.1:8090');
+
+// Disable SDK auto-cancellation of duplicated pending requests to avoid
+// unexpected ClientResponseError when multiple list/fullList calls happen.
+pb.autoCancellation(false);
 
 
 function isAuthenticated() {

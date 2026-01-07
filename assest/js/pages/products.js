@@ -640,61 +640,70 @@ const currentUserId = pb.authStore.model.id;
     const inputMax = document.querySelector('.input-max');
     const progress = document.querySelector('.price-slider .range-track'); 
 
-    const sliderMaxValue = parseInt(rangeMax.max);
+    // If any of the required elements are missing on the page, bail out.
+    if (!rangeMin || !rangeMax || !inputMin || !inputMax || !progress) return;
+
+    const sliderMaxValue = parseInt(rangeMax.max) || 1000;
     let priceGap = 1000; 
 
     const setArea = () => {
-        const leftPos = (rangeMin.value / sliderMaxValue) * 100;
-        const rightPos = 100 - (rangeMax.value / sliderMaxValue) * 100;
+      const leftPos = (rangeMin.value / sliderMaxValue) * 100;
+      const rightPos = 100 - (rangeMax.value / sliderMaxValue) * 100;
         
-        progress.style.left = leftPos + "%";
-        progress.style.right = rightPos + "%";
+      progress.style.left = leftPos + "%";
+      progress.style.right = rightPos + "%";
     };
 
     function slideMin() {
-        let minVal = parseInt(rangeMin.value);
-        let maxVal = parseInt(rangeMax.value);
+      let minVal = parseInt(rangeMin.value);
+      let maxVal = parseInt(rangeMax.value);
 
-        if (maxVal - minVal < priceGap) {
-            rangeMin.value = maxVal - priceGap;
-        }
-        inputMin.value = rangeMin.value;
-        setArea();
-        UI.filterProducts();
+      if (Number.isNaN(minVal) || Number.isNaN(maxVal)) return;
+
+      if (maxVal - minVal < priceGap) {
+        rangeMin.value = maxVal - priceGap;
+      }
+      inputMin.value = rangeMin.value;
+      setArea();
+      UI.filterProducts();
     }
 
     function slideMax() {
-        let minVal = parseInt(rangeMin.value);
-        let maxVal = parseInt(rangeMax.value);
+      let minVal = parseInt(rangeMin.value);
+      let maxVal = parseInt(rangeMax.value);
 
-        if (maxVal - minVal < priceGap) {
-            rangeMax.value = minVal + priceGap;
-        }
-        inputMax.value = rangeMax.value;
-        setArea();
-        UI.filterProducts();
+      if (Number.isNaN(minVal) || Number.isNaN(maxVal)) return;
+
+      if (maxVal - minVal < priceGap) {
+        rangeMax.value = minVal + priceGap;
+      }
+      inputMax.value = rangeMax.value;
+      setArea();
+      UI.filterProducts();
     }
 
     function setMinInput() {
-        let minInput = parseInt(inputMin.value);
-        if (minInput >= (parseInt(rangeMax.value) - priceGap)) {
-            minInput = parseInt(rangeMax.value) - priceGap;
-            inputMin.value = minInput;
-        }
-        rangeMin.value = minInput;
-        setArea();
-        UI.filterProducts();
+      let minInput = parseInt(inputMin.value);
+      if (Number.isNaN(minInput)) return;
+      if (minInput >= (parseInt(rangeMax.value) - priceGap)) {
+        minInput = parseInt(rangeMax.value) - priceGap;
+        inputMin.value = minInput;
+      }
+      rangeMin.value = minInput;
+      setArea();
+      UI.filterProducts();
     }
 
     function setMaxInput() {
-        let maxInput = parseInt(inputMax.value);
-        if (maxInput <= (parseInt(rangeMin.value) + priceGap)) {
-            maxInput = parseInt(rangeMin.value) + priceGap;
-            inputMax.value = maxInput;
-        }
-        rangeMax.value = maxInput;
-        setArea();
-        UI.filterProducts();
+      let maxInput = parseInt(inputMax.value);
+      if (Number.isNaN(maxInput)) return;
+      if (maxInput <= (parseInt(rangeMin.value) + priceGap)) {
+        maxInput = parseInt(rangeMin.value) + priceGap;
+        inputMax.value = maxInput;
+      }
+      rangeMax.value = maxInput;
+      setArea();
+      UI.filterProducts();
     }
 
     rangeMin.addEventListener('input', slideMin);
@@ -703,7 +712,7 @@ const currentUserId = pb.authStore.model.id;
     inputMax.addEventListener('change', setMaxInput);
 
     setArea();
-}
+  }
 
   static createProduct() {
     if(isAuthenticated()) {
@@ -846,6 +855,17 @@ static filterByRating(rating) {
         }
     })
   }
+
+  static async getTotalProducts() {
+    const totalElement = document.querySelector('.total-products');
+    try {
+      const response = await pb.collection('products').getFullList();
+      totalElement.textContent = response.totalItems;
+    } catch(err) {
+      console.error("Failed to get total products:", err);
+      return 0;
+    }
+  }
 }
 
   
@@ -861,48 +881,62 @@ window.addEventListener("DOMContentLoaded", async () => {
 });
 
 // add product
-document.getElementById('add-product').addEventListener('click', (e) => { 
-  e.preventDefault();
-  UI.createProduct()
-  const overlay = document.querySelector('.product-form-overlay');
-  overlay.classList.add('active');
-})
+const addProductBtn = document.getElementById('add-product');
+if (addProductBtn) {
+  addProductBtn.addEventListener('click', (e) => { 
+    e.preventDefault();
+    UI.createProduct();
+    const overlay = document.querySelector('.product-form-overlay');
+    if (overlay) overlay.classList.add('active');
+  });
+}
 
 
 // load more product
 const showMore = document.getElementById('show-more-btn');
 const showLess = document.getElementById('show-less-btn');
 
-showMore.addEventListener('click', () => {
-  UI.increaseCategoryList();
-  showMore.style.display = "none";
-  showLess.style.display = "block";
-})
+if (showMore) {
+  showMore.addEventListener('click', () => {
+    UI.increaseCategoryList();
+    if (showMore) showMore.style.display = "none";
+    if (showLess) showLess.style.display = "block";
+  });
+}
 
 // show less product
-showLess.addEventListener('click', () => {
-  UI.reduceCategoryList();
-  showMore.style.display = "block";
-  showLess.style.display = "none";
-})
+if (showLess) {
+  showLess.addEventListener('click', () => {
+    UI.reduceCategoryList();
+    if (showMore) showMore.style.display = "block";
+    if (showLess) showLess.style.display = "none";
+  });
+}
 
 // logout
-document.querySelector('.log-out').addEventListener('click', () => {
-  UI.logout();
-})
+const logoutBtn = document.querySelector('.log-out');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    UI.logout();
+  });
+}
 
 // reset filters
 const reset = document.querySelector('.reset-btn');
-reset.addEventListener('click', () => {
-  UI.resetFilters();
-})
+if (reset) {
+  reset.addEventListener('click', () => {
+    UI.resetFilters();
+  });
+}
 
 // search products
 const searchInput = document.getElementById('search-input');
-searchInput.addEventListener('input', (e) => {
-  const query = e.target.value;
-  UI.searchProducts(query);
-})
+if (searchInput) {
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value;
+    UI.searchProducts(query);
+  });
+}
 
 // sort products
 UI.filterProductsByPocketBase();
@@ -921,3 +955,5 @@ ratingLabels.forEach(label => {
     }
   });
 })
+
+export { UI };

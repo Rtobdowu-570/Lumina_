@@ -7,8 +7,11 @@ exports.isAuthenticated = isAuthenticated;
 exports.getCurrentUser = getCurrentUser;
 exports.requireAuth = requireAuth;
 exports.pb = void 0;
-var pb = new PocketBase('http://127.0.0.1:8090');
+var pb = new PocketBase('http://127.0.0.1:8090'); // Disable SDK auto-cancellation of duplicated pending requests to avoid
+// unexpected ClientResponseError when multiple list/fullList calls happen.
+
 exports.pb = pb;
+pb.autoCancellation(false);
 
 function isAuthenticated() {
   return pb.authStore.isValid;

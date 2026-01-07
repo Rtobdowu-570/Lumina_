@@ -1,5 +1,10 @@
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.UI = void 0;
+
 var _productCard = require("../components/product-card.js");
 
 var _pocketbase = require("../api/pocketbase.js");
@@ -548,8 +553,10 @@ function () {
       var rangeMax = document.querySelector('.range-max');
       var inputMin = document.querySelector('.input-min');
       var inputMax = document.querySelector('.input-max');
-      var progress = document.querySelector('.price-slider .range-track');
-      var sliderMaxValue = parseInt(rangeMax.max);
+      var progress = document.querySelector('.price-slider .range-track'); // If any of the required elements are missing on the page, bail out.
+
+      if (!rangeMin || !rangeMax || !inputMin || !inputMax || !progress) return;
+      var sliderMaxValue = parseInt(rangeMax.max) || 1000;
       var priceGap = 1000;
 
       var setArea = function setArea() {
@@ -562,6 +569,7 @@ function () {
       function slideMin() {
         var minVal = parseInt(rangeMin.value);
         var maxVal = parseInt(rangeMax.value);
+        if (Number.isNaN(minVal) || Number.isNaN(maxVal)) return;
 
         if (maxVal - minVal < priceGap) {
           rangeMin.value = maxVal - priceGap;
@@ -575,6 +583,7 @@ function () {
       function slideMax() {
         var minVal = parseInt(rangeMin.value);
         var maxVal = parseInt(rangeMax.value);
+        if (Number.isNaN(minVal) || Number.isNaN(maxVal)) return;
 
         if (maxVal - minVal < priceGap) {
           rangeMax.value = minVal + priceGap;
@@ -587,6 +596,7 @@ function () {
 
       function setMinInput() {
         var minInput = parseInt(inputMin.value);
+        if (Number.isNaN(minInput)) return;
 
         if (minInput >= parseInt(rangeMax.value) - priceGap) {
           minInput = parseInt(rangeMax.value) - priceGap;
@@ -600,6 +610,7 @@ function () {
 
       function setMaxInput() {
         var maxInput = parseInt(inputMax.value);
+        if (Number.isNaN(maxInput)) return;
 
         if (maxInput <= parseInt(rangeMin.value) + priceGap) {
           maxInput = parseInt(rangeMin.value) + priceGap;
@@ -801,6 +812,38 @@ function () {
         }
       });
     }
+  }, {
+    key: "getTotalProducts",
+    value: function getTotalProducts() {
+      var totalElement, response;
+      return regeneratorRuntime.async(function getTotalProducts$(_context9) {
+        while (1) {
+          switch (_context9.prev = _context9.next) {
+            case 0:
+              totalElement = document.querySelector('.total-products');
+              _context9.prev = 1;
+              _context9.next = 4;
+              return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').getFullList());
+
+            case 4:
+              response = _context9.sent;
+              totalElement.textContent = response.totalItems;
+              _context9.next = 12;
+              break;
+
+            case 8:
+              _context9.prev = 8;
+              _context9.t0 = _context9["catch"](1);
+              console.error("Failed to get total products:", _context9.t0);
+              return _context9.abrupt("return", 0);
+
+            case 12:
+            case "end":
+              return _context9.stop();
+          }
+        }
+      }, null, null, [[1, 8]]);
+    }
   }]);
 
   return UI;
@@ -808,12 +851,13 @@ function () {
 // on page load 
 
 
+exports.UI = UI;
 window.addEventListener("DOMContentLoaded", function _callee4() {
-  return regeneratorRuntime.async(function _callee4$(_context9) {
+  return regeneratorRuntime.async(function _callee4$(_context10) {
     while (1) {
-      switch (_context9.prev = _context9.next) {
+      switch (_context10.prev = _context10.next) {
         case 0:
-          _context9.next = 2;
+          _context10.next = 2;
           return regeneratorRuntime.awrap(UI.getProducts());
 
         case 2:
@@ -824,47 +868,72 @@ window.addEventListener("DOMContentLoaded", function _callee4() {
 
         case 6:
         case "end":
-          return _context9.stop();
+          return _context10.stop();
       }
     }
   });
 }); // add product
 
-document.getElementById('add-product').addEventListener('click', function (e) {
-  e.preventDefault();
-  UI.createProduct();
-  var overlay = document.querySelector('.product-form-overlay');
-  overlay.classList.add('active');
-}); // load more product
+var addProductBtn = document.getElementById('add-product');
+
+if (addProductBtn) {
+  addProductBtn.addEventListener('click', function (e) {
+    e.preventDefault();
+    UI.createProduct();
+    var overlay = document.querySelector('.product-form-overlay');
+    if (overlay) overlay.classList.add('active');
+  });
+} // load more product
+
 
 var showMore = document.getElementById('show-more-btn');
 var showLess = document.getElementById('show-less-btn');
-showMore.addEventListener('click', function () {
-  UI.increaseCategoryList();
-  showMore.style.display = "none";
-  showLess.style.display = "block";
-}); // show less product
 
-showLess.addEventListener('click', function () {
-  UI.reduceCategoryList();
-  showMore.style.display = "block";
-  showLess.style.display = "none";
-}); // logout
+if (showMore) {
+  showMore.addEventListener('click', function () {
+    UI.increaseCategoryList();
+    if (showMore) showMore.style.display = "none";
+    if (showLess) showLess.style.display = "block";
+  });
+} // show less product
 
-document.querySelector('.log-out').addEventListener('click', function () {
-  UI.logout();
-}); // reset filters
+
+if (showLess) {
+  showLess.addEventListener('click', function () {
+    UI.reduceCategoryList();
+    if (showMore) showMore.style.display = "block";
+    if (showLess) showLess.style.display = "none";
+  });
+} // logout
+
+
+var logoutBtn = document.querySelector('.log-out');
+
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', function () {
+    UI.logout();
+  });
+} // reset filters
+
 
 var reset = document.querySelector('.reset-btn');
-reset.addEventListener('click', function () {
-  UI.resetFilters();
-}); // search products
+
+if (reset) {
+  reset.addEventListener('click', function () {
+    UI.resetFilters();
+  });
+} // search products
+
 
 var searchInput = document.getElementById('search-input');
-searchInput.addEventListener('input', function (e) {
-  var query = e.target.value;
-  UI.searchProducts(query);
-}); // sort products
+
+if (searchInput) {
+  searchInput.addEventListener('input', function (e) {
+    var query = e.target.value;
+    UI.searchProducts(query);
+  });
+} // sort products
+
 
 UI.filterProductsByPocketBase(); //filter by rating
 

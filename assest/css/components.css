@@ -197,7 +197,7 @@
 /* Toast Notification */
 .toast {
     position: fixed;
-    top: 24px;
+    top: 30px;
     right: 24px;
     background: var(--card-color);
     border: 1px solid var(--border-color);
