@@ -1,10 +1,32 @@
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.calculateItemPrice = calculateItemPrice;
+
 var _cartItem = require("../components/cart-item.js");
 
 var _pocketbase = require("../api/pocketbase.js");
 
 var cartItem = new _cartItem.CartItem();
+
+function searchCart(query) {
+  var cartItems = document.querySelectorAll('.cart-item');
+  var lowerQuery = query.toLowerCase();
+  cartItems.forEach(function (item) {
+    var name = item.querySelector('.item-name');
+    if (!name) return;
+    var itemName = name.textContent;
+    var lowerItemName = itemName.toLowerCase();
+
+    if (lowerItemName.includes(lowerQuery)) {
+      item.style.display = 'flex';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
 
 function displayCart() {
   var user, data, cartContainer;
@@ -178,19 +200,17 @@ function calculateItemPrice() {
 
         case 3:
           data = _context4.sent;
-          console.log(data); // Calculate totals for all items
-
           subtotal = 0;
           data.forEach(function (pd) {
             var paymentData = pd.expand.product;
             subtotal += pd.quantity * paymentData.price;
           });
           shipping = subtotal * 0.01;
-          tax = subtotal * 0.05 * 0.05;
+          tax = subtotal * 0.01 * 0.05;
           total = subtotal + shipping + tax;
           paymentSummary.innerHTML = "\n        <div class=\"summary-row\">\n            <span>Subtotal (<span id=\"total-items\">".concat(data.length, "</span> ").concat(data.length > 1 ? 'items' : 'item', ")</span>\n            <span id=\"subtotal\">$").concat(subtotal.toFixed(2), "</span>\n        </div>\n        <div class=\"summary-row\">\n            <span>Shipping</span>\n            <span id=\"shipping\">$").concat(shipping.toFixed(2), "</span>\n        </div>\n        <div class=\"summary-row\">\n            <span>Tax</span>\n            <span id=\"tax\">$").concat(tax.toFixed(2), "</span>\n        </div>\n        <div class=\"summary-row discount\" id=\"discount-row\" style=\"display: none\">\n            <span>Discount</span>\n            <span id=\"discount\">-$0.00</span>\n        </div>\n        <div class=\"summary-divider\"></div>\n        <div class=\"summary-row total\">\n            <span>Total</span>\n            <span id=\"total\">$").concat(total.toFixed(2), "</span>\n        </div>\n    ");
 
-        case 11:
+        case 10:
         case "end":
           return _context4.stop();
       }
@@ -238,5 +258,18 @@ document.addEventListener('DOMContentLoaded', function () {
 var logOutBtn = document.querySelector('.log-out');
 logOutBtn.addEventListener('click', function () {
   logOut();
+});
+var checkOut = document.querySelector('.checkout-btn');
+checkOut.addEventListener('click', function () {
+  window.location.href = '/public/checkout.html';
+});
+var continueShopping = document.querySelector('.continue-shopping-btn');
+continueShopping.addEventListener('click', function () {
+  window.location.href = '/public/products.html';
+});
+var search = document.querySelector('.search-input');
+search.addEventListener('input', function () {
+  var searchItem = search.value;
+  searchCart(searchItem);
 });
 //# sourceMappingURL=cart.dev.js.map

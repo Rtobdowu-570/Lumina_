@@ -3,6 +3,25 @@ import { pb, isAuthenticated } from '../api/pocketbase.js';
 
 const cartItem = new CartItem();
 
+
+function searchCart(query) {
+    const cartItems = document.querySelectorAll('.cart-item');
+    const lowerQuery = query.toLowerCase();
+
+    cartItems.forEach(item => {
+        const name = item.querySelector('.item-name')
+        if(!name) return;
+
+        let itemName = name.textContent
+        const lowerItemName = itemName.toLowerCase();
+        if(lowerItemName.includes(lowerQuery)) {
+            item.style.display = 'flex';
+        }
+        else {
+            item.style.display = 'none';
+        }
+    })
+}
 async function displayCart() {
     try {
         const user = getCurrentUser();
@@ -101,9 +120,6 @@ async function calculateItemPrice() {
         expand: 'product'
     });
 
-    console.log(data);
-
-    // Calculate totals for all items
     let subtotal = 0;
     data.forEach(pd => {
         const paymentData = pd.expand.product;
@@ -111,7 +127,7 @@ async function calculateItemPrice() {
     });
 
     const shipping = subtotal * 0.01;
-    const tax = (subtotal * 0.05) * 0.05;
+    const tax = (subtotal * 0.01) * 0.05;
     const total = subtotal + shipping + tax;
 
     paymentSummary.innerHTML = 
@@ -183,3 +199,21 @@ const logOutBtn = document.querySelector('.log-out');
 logOutBtn.addEventListener('click', () => {
     logOut();
 });
+
+const checkOut = document.querySelector('.checkout-btn');
+checkOut.addEventListener('click', () => {
+    window.location.href = '/public/checkout.html';
+});
+
+const continueShopping = document.querySelector('.continue-shopping-btn');
+continueShopping.addEventListener('click', () => {
+    window.location.href = '/public/products.html';
+});
+
+const search = document.querySelector('.search-input')
+search.addEventListener('input', () => {
+    const searchItem = search.value;
+    searchCart(searchItem);
+});
+
+export { calculateItemPrice }
