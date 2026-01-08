@@ -950,4 +950,13 @@ ratingLabels.forEach(function (label) {
     }
   });
 });
+var check = document.querySelector('.dashboard, .cart, .orders, .analytics, .settings');
+
+if (check) {
+  check.addEventListener('click', function () {
+    if (!(0, _pocketbase.isAuthenticated)()) {
+      window.location.href = '/public/auth/auth.html';
+    }
+  });
+}
 //# sourceMappingURL=products.dev.js.map

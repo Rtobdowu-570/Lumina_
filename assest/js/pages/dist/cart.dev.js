@@ -4,6 +4,10 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.calculateItemPrice = calculateItemPrice;
+exports.checkAuth = checkAuth;
+exports.displayUsername = displayUsername;
+exports.logOut = logOut;
+exports.getCurrentUser = getCurrentUser;
 
 var _cartItem = require("../components/cart-item.js");
 
@@ -272,4 +276,13 @@ search.addEventListener('input', function () {
   var searchItem = search.value;
   searchCart(searchItem);
 });
+var check = document.querySelector('.dashboard, .cart, .orders, .analytics, .settings');
+
+if (check) {
+  check.addEventListener('click', function () {
+    if (!(0, _pocketbase.isAuthenticated)()) {
+      window.location.href = '/public/auth/auth.html';
+    }
+  });
+}
 //# sourceMappingURL=cart.dev.js.map

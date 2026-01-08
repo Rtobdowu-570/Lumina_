@@ -285,8 +285,7 @@
   cursor: pointer;
 }
 
-.shipping-option.active,
-.shipping-option input[type="radio"]:checked ~ * {
+.shipping-option.active{
   border-color: var(--primary-color);
   background: rgba(255, 107, 107, 0.05);
 }
@@ -337,8 +336,7 @@
   border-color: var(--primary-color);
 }
 
-.payment-option.active,
-.payment-option input[type="radio"]:checked ~ * {
+.payment-option.active {
   border-color: var(--primary-color);
   background: rgba(255, 107, 107, 0.05);
 }
@@ -349,6 +347,7 @@
 }
 
 .payment-icon {
+  margin-top: 4px;
   font-size: 24px;
 }
 

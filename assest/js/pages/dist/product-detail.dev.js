@@ -323,4 +323,13 @@ var logOutBtn = document.querySelector('.log-out');
 logOutBtn.addEventListener('click', function () {
   detail.logOut();
 });
+var check = document.querySelector('.dashboard, .cart, .orders, .analytics, .settings');
+
+if (check) {
+  check.addEventListener('click', function () {
+    if (!(0, _pocketbase.isAuthenticated)()) {
+      window.location.href = '/public/auth/auth.html';
+    }
+  });
+}
 //# sourceMappingURL=product-detail.dev.js.map

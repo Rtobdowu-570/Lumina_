@@ -354,3 +354,12 @@ logOutBtn.addEventListener('click', () => {
     detail.logOut();
 });
 
+const check = document.querySelector('.dashboard, .cart, .orders, .analytics, .settings');
+if (check) {
+  check.addEventListener('click', () => {
+   if(!isAuthenticated()) {
+    window.location.href = '/public/auth/auth.html';
+   }
+  });
+}
+
