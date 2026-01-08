@@ -200,21 +200,23 @@ img{
 }
 
 /* Cart Item Animations */
-.cart-item.removing {
-  animation: slideOut 0.3s ease-out;
+.removing {
+  animation: scaleOut 0.3s ease-out;
   opacity: 0;
 }
 
-@keyframes slideOut {
+@keyframes scaleOut {
   from {
-    transform: translateX(0);
+    transform: scale(1);
     opacity: 1;
   }
   to {
-    transform: translateX(-100%);
+    transform: scale(0);
     opacity: 0;
   }
 }
+
+
 
 /* Checkout Page */
 .checkout-progress {

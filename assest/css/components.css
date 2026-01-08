@@ -98,7 +98,7 @@
     transition: opacity 0.3s;
 }
 
-.modal-overlay.show {
+.show {
     opacity: 1;
 }
 

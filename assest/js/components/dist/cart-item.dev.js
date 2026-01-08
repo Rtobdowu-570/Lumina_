@@ -7,6 +7,8 @@ exports.CartItem = void 0;
 
 var _modal = require("../components/modal.js");
 
+var _pocketbase = require("../api/pocketbase.js");
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -22,32 +24,63 @@ function () {
 
   _createClass(CartItem, [{
     key: "remove",
-    value: function remove() {
+    value: function remove(element) {
       var _this = this;
 
-      var modal = new _modal.Modal();
-      var newModal = modal.show({
+      var config = {
         title: "Remove Item",
         message: "Are you sure you want to remove this item from your cart?",
         confirmText: "Remove",
         cancelText: "Cancel",
         onConfirm: function onConfirm() {
-          var element = document.querySelector("[data-id=\"".concat(_this.id, "\"]"));
-          element.classList.add("removing");
-          setTimeout(function () {
-            element.remove();
+          return regeneratorRuntime.async(function onConfirm$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  if (!element) {
+                    _context.next = 11;
+                    break;
+                  }
 
-            _this.updateCart();
-          }, 300);
-        }
-      });
-      newModal.addEventListener("click", function (e) {
-        var action = e.target.dataset.action;
+                  _context.prev = 1;
+                  _context.next = 4;
+                  return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart')["delete"](element.dataset.id));
 
-        if (action === "cancel") {
-          modal.hide(newModal);
+                case 4:
+                  element.classList.add("removing");
+                  setTimeout(function () {
+                    element.remove();
+
+                    _this.updateCart();
+                  }, 300);
+                  _context.next = 11;
+                  break;
+
+                case 8:
+                  _context.prev = 8;
+                  _context.t0 = _context["catch"](1);
+                  console.error('Failed to delete cart item:', _context.t0);
+
+                case 11:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, null, null, [[1, 8]]);
+        },
+        onCancel: function onCancel() {
+          var modal = document.querySelector(".modal");
+
+          if (modal) {
+            modal.classList.remove("show");
+            setTimeout(function () {
+              return modal.remove();
+            }, 300);
+          }
         }
-      });
+      };
+      var modal = new _modal.Modal(config);
+      modal.show();
     }
   }, {
     key: "updateCart",

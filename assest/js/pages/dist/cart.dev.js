@@ -80,35 +80,36 @@ function attachEventListeners(item) {
             action = btn ? btn.dataset.action : null;
 
             if (!(action === "decrease")) {
-              _context2.next = 6;
+              _context2.next = 7;
               break;
             }
 
-            updateQuantity(item, action);
-            _context2.next = 14;
+            _context2.next = 5;
+            return regeneratorRuntime.awrap(updateQuantity(item, action));
+
+          case 5:
+            _context2.next = 13;
             break;
 
-          case 6:
+          case 7:
             if (!(action === "increase")) {
-              _context2.next = 10;
+              _context2.next = 12;
               break;
             }
 
-            updateQuantity(item, action);
-            _context2.next = 14;
-            break;
+            _context2.next = 10;
+            return regeneratorRuntime.awrap(updateQuantity(item, action));
 
           case 10:
-            if (!(action === "remove")) {
-              _context2.next = 14;
-              break;
+            _context2.next = 13;
+            break;
+
+          case 12:
+            if (action === "remove") {
+              cartItem.remove(item);
             }
 
-            cartItem.remove(item);
-            _context2.next = 14;
-            return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart')["delete"](item.dataset.id));
-
-          case 14:
+          case 13:
           case "end":
             return _context2.stop();
         }
@@ -162,6 +163,41 @@ function updateQuantity(item, action) {
   });
 }
 
+function calculateItemPrice() {
+  var paymentSummary, data, subtotal, shipping, tax, total;
+  return regeneratorRuntime.async(function calculateItemPrice$(_context4) {
+    while (1) {
+      switch (_context4.prev = _context4.next) {
+        case 0:
+          paymentSummary = document.querySelector('.summary-details');
+          _context4.next = 3;
+          return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').getFullList({
+            filter: "user = \"".concat(getCurrentUser().id, "\""),
+            expand: 'product'
+          }));
+
+        case 3:
+          data = _context4.sent;
+          console.log(data); // Calculate totals for all items
+
+          subtotal = 0;
+          data.forEach(function (pd) {
+            var paymentData = pd.expand.product;
+            subtotal += pd.quantity * paymentData.price;
+          });
+          shipping = subtotal * 0.01;
+          tax = subtotal * 0.05 * 0.05;
+          total = subtotal + shipping + tax;
+          paymentSummary.innerHTML = "\n        <div class=\"summary-row\">\n            <span>Subtotal (<span id=\"total-items\">".concat(data.length, "</span> ").concat(data.length > 1 ? 'items' : 'item', ")</span>\n            <span id=\"subtotal\">$").concat(subtotal.toFixed(2), "</span>\n        </div>\n        <div class=\"summary-row\">\n            <span>Shipping</span>\n            <span id=\"shipping\">$").concat(shipping.toFixed(2), "</span>\n        </div>\n        <div class=\"summary-row\">\n            <span>Tax</span>\n            <span id=\"tax\">$").concat(tax.toFixed(2), "</span>\n        </div>\n        <div class=\"summary-row discount\" id=\"discount-row\" style=\"display: none\">\n            <span>Discount</span>\n            <span id=\"discount\">-$0.00</span>\n        </div>\n        <div class=\"summary-divider\"></div>\n        <div class=\"summary-row total\">\n            <span>Total</span>\n            <span id=\"total\">$").concat(total.toFixed(2), "</span>\n        </div>\n    ");
+
+        case 11:
+        case "end":
+          return _context4.stop();
+      }
+    }
+  });
+}
+
 function checkAuth() {
   if (!(0, _pocketbase.isAuthenticated)()) {
     window.location.href = '/public/auth/auth.html';
@@ -197,5 +233,10 @@ document.addEventListener('DOMContentLoaded', function () {
   displayCart();
   checkAuth();
   displayUsername();
+  calculateItemPrice();
+});
+var logOutBtn = document.querySelector('.log-out');
+logOutBtn.addEventListener('click', function () {
+  logOut();
 });
 //# sourceMappingURL=cart.dev.js.map

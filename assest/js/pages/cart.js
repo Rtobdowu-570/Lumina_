@@ -67,12 +67,11 @@ async function displayCart() {
         const btn = e.target.closest('button');
         const action = btn ? btn.dataset.action : null;
         if (action === "decrease") {
-            updateQuantity(item, action)
+            await updateQuantity(item, action)
         } else if (action === "increase") {
-            updateQuantity(item, action)
+            await updateQuantity(item, action)
         } else if (action === "remove") {
             cartItem.remove(item);
-            await pb.collection('cart').delete(item.dataset.id)
         }
     })
 }
@@ -94,6 +93,53 @@ async function updateQuantity(item, action) {
         })
     }
 }
+
+async function calculateItemPrice() {
+    const paymentSummary = document.querySelector('.summary-details');
+    const data = await pb.collection('cart').getFullList({
+        filter: `user = "${getCurrentUser().id}"`,
+        expand: 'product'
+    });
+
+    console.log(data);
+
+    // Calculate totals for all items
+    let subtotal = 0;
+    data.forEach(pd => {
+        const paymentData = pd.expand.product;
+        subtotal += pd.quantity * paymentData.price;
+    });
+
+    const shipping = subtotal * 0.01;
+    const tax = (subtotal * 0.05) * 0.05;
+    const total = subtotal + shipping + tax;
+
+    paymentSummary.innerHTML = 
+    `
+        <div class="summary-row">
+            <span>Subtotal (<span id="total-items">${data.length}</span> ${data.length > 1 ? 'items' : 'item'})</span>
+            <span id="subtotal">$${subtotal.toFixed(2)}</span>
+        </div>
+        <div class="summary-row">
+            <span>Shipping</span>
+            <span id="shipping">$${shipping.toFixed(2)}</span>
+        </div>
+        <div class="summary-row">
+            <span>Tax</span>
+            <span id="tax">$${tax.toFixed(2)}</span>
+        </div>
+        <div class="summary-row discount" id="discount-row" style="display: none">
+            <span>Discount</span>
+            <span id="discount">-$0.00</span>
+        </div>
+        <div class="summary-divider"></div>
+        <div class="summary-row total">
+            <span>Total</span>
+            <span id="total">$${total.toFixed(2)}</span>
+        </div>
+    `
+}
+
 
 function checkAuth() {
     if (!isAuthenticated()) {
@@ -130,4 +176,10 @@ document.addEventListener('DOMContentLoaded',  () => {
    displayCart();
     checkAuth();
     displayUsername();
+    calculateItemPrice();
+});
+
+const logOutBtn = document.querySelector('.log-out');
+logOutBtn.addEventListener('click', () => {
+    logOut();
 });
