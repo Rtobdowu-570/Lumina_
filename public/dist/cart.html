@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="../assest/css/components.css" />
         <link rel="stylesheet" href="../assest/css/cart.css" />
         <link rel="stylesheet" href="../assest/css/products.css" />
+        <link rel="icon" href="/assest/images/favicon.ico" type="image/x-icon" />
         <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
@@ -190,7 +191,7 @@
                             </button>
                         </div>
 
-                        <div id="cart-items"></div>
+                        <div id="cart-items" class="cart-items"></div>
                     </div>
 
                     <div class="order-summary">
@@ -254,5 +255,6 @@
             </main>
         </div>
     </body>
-    <script type="module" src="js/pages/cart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pocketbase/dist/pocketbase.umd.js"></script>
+    <script type="module" src="/assest/js/pages/cart.js"></script>
 </html>
