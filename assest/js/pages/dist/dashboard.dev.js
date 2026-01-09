@@ -72,12 +72,11 @@ function displayUserData() {
 
         case 8:
           user = _context.sent;
-          output = "\n                <div class=\"stat-img\">\n                    <img src=\"".concat(user.avatar || '/assest/images/placeholder.jpg', "\" alt=\"").concat(user.name || '', "\" class=\"user-avatar stat\"></div>\n                <div class=\"stat-content user-data\">\n                    <div class=\"stat-value\">").concat(user.name || '', " <span class=\"edit-profile-btn\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#FF5C5C\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                    <path d=\"M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z\"></path>\n                    </svg>\n                    </span></div>\n                    <div class=\"stat-label\">").concat(user.email || '', "</div>\n                </div>");
+          output = "\n                <div class=\"stat-img\">\n                    <img src=\"".concat(user.avatar || '/assest/images/placeholder.jpg', "\" alt=\"").concat(user.name || '', "\" class=\"user-avatar stat\"></div>\n                <div class=\"stat-content user-data\">\n                    <div class=\"stat-value\">").concat(user.name || '', " <span class=\"edit-profile-btn\">\n                    <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#FF5C5C\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n                    <path d=\"M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z\"></path>\n                    </svg>\n                    </span></div>\n                    <div class=\"stat-label\">").concat(user.email || '', "</div>\n                    <div class=\"stat-label\">").concat(user.user_name || '', "</div>\n                </div>");
           container = document.querySelector('.user-stats');
 
           if (container) {
             container.innerHTML = output;
-            console.log('User data rendered into:', container);
           } else {
             console.warn('No container found for user data');
           }
@@ -98,9 +97,67 @@ function displayUserData() {
   }, null, null, [[5, 14]]);
 }
 
+function getStatusHTML(order) {
+  var statusClass = '';
+  var statusText = '';
+
+  if (order.delivered) {
+    statusClass = 'delivered';
+    statusText = 'Delivered';
+  } else if (order.shipped) {
+    statusClass = 'shipped';
+    statusText = 'Shipped';
+  } else if (order.successful) {
+    statusClass = 'delivered';
+    statusText = 'Successful';
+  } else if (order.failed) {
+    statusClass = 'failed';
+    statusText = 'Failed';
+  } else {
+    statusClass = 'processing';
+    statusText = 'Processing';
+  }
+
+  return "<span class=\"status-badge ".concat(statusClass, "\">").concat(statusText, "</span>");
+}
+
+function displayUserOrder() {
+  var orderContainer, userId, orderData, row, year;
+  return regeneratorRuntime.async(function displayUserOrder$(_context2) {
+    while (1) {
+      switch (_context2.prev = _context2.next) {
+        case 0:
+          orderContainer = document.querySelector('.orders-table');
+          userId = getCurrentUser().id;
+          _context2.next = 4;
+          return regeneratorRuntime.awrap(_pocketbase.pb.collection('checkout').getFullList({
+            filter: "user = \"".concat(getCurrentUser().id, "\"")
+          }));
+
+        case 4:
+          orderData = _context2.sent;
+          row = document.createElement('div');
+          year = new Date().getFullYear();
+          orderData.forEach(function (order) {
+            if (order.delivered === true || order.shipped === true || order.successful === true || order.failed === true) {}
+
+            row.className = 'table-row';
+            row.innerHTML = "\n        <div class=\"table-cell\">#ORD-".concat(year, "-").concat(order.id.slice(0, 3).toUpperCase(), "</div>\n        <div class=\"table-cell\">").concat(order.created.slice(0, 10), "</div>\n        <div class=\"table-cell\">").concat(order.items.length, " items</div>\n        <div class=\"table-cell\">$").concat(order.total, "</div>\n        <div class=\"table-cell\">").concat(getStatusHTML(order), "</div>\n        <div class=\"table-cell\"><button class=\"view-btn\">View</button></div>\n    ");
+          });
+          orderContainer.appendChild(row);
+
+        case 9:
+        case "end":
+          return _context2.stop();
+      }
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   checkAuth();
   displayUsername();
   displayUserData();
+  displayUserOrder();
 });
 //# sourceMappingURL=dashboard.dev.js.map

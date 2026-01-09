@@ -15,8 +15,7 @@ function showPaymentModal() {
     confirmText: "Confirm",
     cancelText: "Cancel",
     onConfirm: function onConfirm() {
-      var user, cartRecord, cartItemIds, data, checkoutRecord, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, id, modal;
-
+      var user, cartRecord, last, toTal, cartItemIds, data, checkoutRecord, modal;
       return regeneratorRuntime.async(function onConfirm$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -30,6 +29,9 @@ function showPaymentModal() {
 
             case 4:
               cartRecord = _context.sent;
+              last = document.querySelector('.last');
+              toTal = last;
+              console.log(toTal);
               cartItemIds = cartRecord.map(function (record) {
                 return record.id;
               });
@@ -37,69 +39,14 @@ function showPaymentModal() {
                 "items": cartItemIds,
                 "user": user,
                 "successful": true,
-                "failed": false
+                "failed": false,
+                "total": toTal
               };
-              _context.next = 9;
+              _context.next = 12;
               return regeneratorRuntime.awrap(_pocketbase.pb.collection('checkout').create(data));
 
-            case 9:
+            case 12:
               checkoutRecord = _context.sent;
-              _iteratorNormalCompletion = true;
-              _didIteratorError = false;
-              _iteratorError = undefined;
-              _context.prev = 13;
-              _iterator = cartItemIds[Symbol.iterator]();
-
-            case 15:
-              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                _context.next = 22;
-                break;
-              }
-
-              id = _step.value;
-              _context.next = 19;
-              return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart')["delete"](id));
-
-            case 19:
-              _iteratorNormalCompletion = true;
-              _context.next = 15;
-              break;
-
-            case 22:
-              _context.next = 28;
-              break;
-
-            case 24:
-              _context.prev = 24;
-              _context.t0 = _context["catch"](13);
-              _didIteratorError = true;
-              _iteratorError = _context.t0;
-
-            case 28:
-              _context.prev = 28;
-              _context.prev = 29;
-
-              if (!_iteratorNormalCompletion && _iterator["return"] != null) {
-                _iterator["return"]();
-              }
-
-            case 31:
-              _context.prev = 31;
-
-              if (!_didIteratorError) {
-                _context.next = 34;
-                break;
-              }
-
-              throw _iteratorError;
-
-            case 34:
-              return _context.finish(31);
-
-            case 35:
-              return _context.finish(28);
-
-            case 36:
               cartItem.showToast("Payment Successful! Order Created.");
               modal = document.querySelector(".modal");
 
@@ -110,12 +57,12 @@ function showPaymentModal() {
                 }, 300);
               }
 
-            case 39:
+            case 16:
             case "end":
               return _context.stop();
           }
         }
-      }, null, null, [[13, 24, 28, 36], [29,, 31, 35]]);
+      });
     },
     onCancel: function onCancel() {
       cartItem.showToast('Payment failed');

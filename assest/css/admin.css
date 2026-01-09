@@ -141,6 +141,11 @@
   color: var(--success-color);
 }
 
+.status-badge.failed {
+  background: rgba(197, 42, 34, 0.1);
+  color: var(--success-color);
+}
+
 .status-badge.shipped {
   background: rgba(59, 130, 246, 0.1);
   color: var(--accent-blue);

@@ -50,12 +50,12 @@ async function displayUserData() {
                     </svg>
                     </span></div>
                     <div class="stat-label">${user.email || ''}</div>
+                    <div class="stat-label">${user.user_name || ''}</div>
                 </div>`;
         
         const container = document.querySelector('.user-stats');
         if (container) {
             container.innerHTML = output;
-            console.log('User data rendered into:', container);
         } else {
             console.warn('No container found for user data');
         }
@@ -64,10 +64,62 @@ async function displayUserData() {
     }
 }
 
+function getStatusHTML(order) {
+    let statusClass = '';
+    let statusText = '';
+
+    if (order.delivered) {
+        statusClass = 'delivered';
+        statusText = 'Delivered';
+    } else if (order.shipped) {
+        statusClass = 'shipped';
+        statusText = 'Shipped';
+    } else if (order.successful) {
+        statusClass = 'delivered';
+        statusText = 'Successful';
+    } else if (order.failed) {
+        statusClass = 'failed';
+        statusText = 'Failed';
+    } else {
+        statusClass = 'processing';
+        statusText = 'Processing';
+    }
+
+    return `<span class="status-badge ${statusClass}">${statusText}</span>`;
+}
+
+async function displayUserOrder() {
+    const orderContainer = document.querySelector('.orders-table')
+    const userId = getCurrentUser().id;
+
+    const orderData = await pb.collection('checkout').getFullList({
+        filter: `user = "${getCurrentUser().id}"`
+    });
+    const row = document.createElement('div');
+    const year = new Date().getFullYear();
+    orderData.forEach(order => {
+
+        if(order.delivered === true || order.shipped === true || order.successful === true || order.failed === true) {
+        }
+
+        row.className = 'table-row';
+        row.innerHTML = `
+        <div class="table-cell">#ORD-${year}-${(order.id).slice(0, 3).toUpperCase()}</div>
+        <div class="table-cell">${order.created.slice(0, 10)}</div>
+        <div class="table-cell">${order.items.length} items</div>
+        <div class="table-cell">$${order.total}</div>
+        <div class="table-cell">${getStatusHTML(order)}</div>
+        <div class="table-cell"><button class="view-btn">View</button></div>
+    `
+    })
+    orderContainer.appendChild(row);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     displayUsername();
     displayUserData();
+    displayUserOrder();
 });
 
 export { logOut, getCurrentUser, checkAuth, displayUsername };

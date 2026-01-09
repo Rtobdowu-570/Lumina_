@@ -16,17 +16,20 @@ function showPaymentModal() {
             const cartRecord = await pb.collection('cart').getFullList({
                 filter: `user = "${getCurrentUser().id}"`
             })
+
+            const last = document.querySelector('.last');
+            const toTal = last
+            console.log(toTal);
+
             const cartItemIds = cartRecord.map(record => record.id);
             const data = {
             "items": cartItemIds,
             "user": user,
             "successful": true,
-            "failed": false
+            "failed": false,
+            "total": toTal
         };
         const checkoutRecord = await pb.collection('checkout').create(data);
-        for (let id of cartItemIds) {
-            await pb.collection('cart').delete(id);
-        }
         cartItem.showToast("Payment Successful! Order Created.");
 
             const modal = document.querySelector(".modal");
