@@ -34,7 +34,7 @@ function () {
 
       var modal = document.createElement("div");
       modal.className = "modal-overlay";
-      modal.innerHTML = "\n      <div class=\"modal-content\">\n        <div class=\"modal-header\">\n          <h3>".concat(this.title, "</h3>\n          <button class=\"modal-close\" data-action=\"close\">\xD7</button>\n        </div>\n        <div class=\"modal-body\">\n          <p>").concat(this.message, "</p>\n        </div>\n        <div class=\"modal-footer\">\n          <button class=\"modal-btn cancel-btn\" data-action=\"cancel\">").concat(this.cancelText, "</button>\n          <button class=\"modal-btn confirm-btn\" data-action=\"confirm\">").concat(this.confirmText, "</button>\n        </div>\n      </div>\n    ");
+      modal.innerHTML = "\n      <div class=\"modal-content\">\n        <div class=\"modal-header\">\n        <h2>  </h2>\n          <h3>".concat(this.title, "</h3>\n          <button class=\"modal-close\" data-action=\"close\">\xD7</button>\n        </div>\n        <div class=\"modal-body\">\n          <p>").concat(this.message, "</p>\n        </div>\n        <div class=\"modal-footer\">\n          <button class=\"modal-btn cancel-btn\" data-action=\"cancel\">").concat(this.cancelText, "</button>\n          <button class=\"modal-btn confirm-btn\" data-action=\"confirm\">").concat(this.confirmText, "</button>\n        </div>\n      </div>\n    ");
       document.body.appendChild(modal);
       setTimeout(function () {
         return modal.classList.add("show");

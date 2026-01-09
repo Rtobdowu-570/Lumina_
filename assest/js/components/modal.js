@@ -15,6 +15,7 @@ class Modal {
     modal.innerHTML = `
       <div class="modal-content">
         <div class="modal-header">
+        <h2>  </h2>
           <h3>${this.title}</h3>
           <button class="modal-close" data-action="close">×</button>
         </div>

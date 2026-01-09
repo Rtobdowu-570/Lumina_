@@ -1,5 +1,84 @@
 import { pb, isAuthenticated } from '../api/pocketbase.js';
+import {  Modal } from "../components/modal.js";
+import { CartItem } from "../components/cart-item.js";
 
+const cartItem = new CartItem();
+
+function showPaymentModal() {
+    const PaymentModal = {
+        title: "Payment",
+        message: "Are you sure you want to proceed to payment?",
+        confirmText: "Confirm",
+        cancelText: "Cancel",
+        onConfirm: async () => {
+            cartItem.showToast('Payment successful');
+            const user = getCurrentUser().id;
+            const cartRecord = await pb.collection('cart').getFullList({
+                filter: `user = "${getCurrentUser().id}"`
+            })
+            const cartItemIds = cartRecord.map(record => record.id);
+            const data = {
+            "items": cartItemIds,
+            "user": user,
+            "successful": true,
+            "failed": false
+        };
+        const checkoutRecord = await pb.collection('checkout').create(data);
+        for (let id of cartItemIds) {
+            await pb.collection('cart').delete(id);
+        }
+        cartItem.showToast("Payment Successful! Order Created.");
+
+            const modal = document.querySelector(".modal");
+            if (modal) {
+                modal.classList.remove("show");
+                setTimeout(() => modal.remove(), 300);
+            }
+        },
+        onCancel: () => {
+            cartItem.showToast('Payment failed');
+            const modal = document.querySelector(".modal");
+            if (modal) {
+                modal.classList.remove("show");
+                setTimeout(() => modal.remove(), 300);
+            }
+        },
+    }
+    const modal = new Modal(PaymentModal);
+    modal.show();
+}
+
+function ValidateInput() {
+    const inputs = Array.from(document.querySelectorAll('input:not([type="hidden"])'));
+    const completeBtn = document.querySelector('.complete');
+
+    if (!completeBtn) return;
+
+    function validate() {
+        const hasEmpty = inputs.some(i => !i.value || i.value.trim() === '');
+        
+        completeBtn.disabled = hasEmpty;
+
+        if (!hasEmpty) {
+            completeBtn.classList.add('ready-pulse');
+            completeBtn.innerHTML = 'Complete Payment ✓';
+        } else {
+            completeBtn.classList.remove('ready-pulse');
+            completeBtn.innerHTML = 'Complete Payment'; 
+        }
+
+        return hasEmpty;
+    }
+
+    inputs.forEach(i => i.addEventListener('input', validate));
+
+    validate();
+
+    completeBtn.addEventListener('click', (e) => {
+        e.preventDefault(); 
+        showPaymentModal();
+    });
+}
 
 async function getProductAddedToCart(shippingRate = 0.001) {
     const data = await pb.collection('cart').getFullList({
@@ -80,6 +159,7 @@ function logOut() {
 document.addEventListener('DOMContentLoaded',  () => {
     checkAuth();
     displayUsername();
+    ValidateInput()
     getProductAddedToCart()
 });
 
@@ -117,3 +197,4 @@ const goBack = document.querySelector('.return');
 goBack.addEventListener('click', () => {
     window.location.href = '/public/cart.html';
 })
+

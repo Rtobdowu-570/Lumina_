@@ -95,39 +95,61 @@ function displayCart() {
   }, null, null, [[0, 15]]);
 }
 
-function attachEventListeners(item) {
-  item.addEventListener('click', function _callee(e) {
-    var btn, action;
+function DeleteAllCart() {
+  var del = document.getElementById('clear-cart');
+  del.addEventListener('click', function _callee() {
     return regeneratorRuntime.async(function _callee$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.next = 2;
+            return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart')["delete"]());
+
+          case 2:
+            cartItem.remove();
+
+          case 3:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    });
+  });
+}
+
+function attachEventListeners(item) {
+  item.addEventListener('click', function _callee2(e) {
+    var btn, action;
+    return regeneratorRuntime.async(function _callee2$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
           case 0:
             btn = e.target.closest('button');
             action = btn ? btn.dataset.action : null;
 
             if (!(action === "decrease")) {
-              _context2.next = 7;
+              _context3.next = 7;
               break;
             }
 
-            _context2.next = 5;
+            _context3.next = 5;
             return regeneratorRuntime.awrap(updateQuantity(item, action));
 
           case 5:
-            _context2.next = 13;
+            _context3.next = 13;
             break;
 
           case 7:
             if (!(action === "increase")) {
-              _context2.next = 12;
+              _context3.next = 12;
               break;
             }
 
-            _context2.next = 10;
+            _context3.next = 10;
             return regeneratorRuntime.awrap(updateQuantity(item, action));
 
           case 10:
-            _context2.next = 13;
+            _context3.next = 13;
             break;
 
           case 12:
@@ -137,7 +159,7 @@ function attachEventListeners(item) {
 
           case 13:
           case "end":
-            return _context2.stop();
+            return _context3.stop();
         }
       }
     });
@@ -146,44 +168,44 @@ function attachEventListeners(item) {
 
 function updateQuantity(item, action) {
   var input, quantity, currentQuantity;
-  return regeneratorRuntime.async(function updateQuantity$(_context3) {
+  return regeneratorRuntime.async(function updateQuantity$(_context4) {
     while (1) {
-      switch (_context3.prev = _context3.next) {
+      switch (_context4.prev = _context4.next) {
         case 0:
           input = item.querySelector('[data-action="quantity"]');
           quantity = input.value;
           currentQuantity = parseInt(quantity);
 
           if (!(action === "increase")) {
-            _context3.next = 9;
+            _context4.next = 9;
             break;
           }
 
           input.value = currentQuantity + 1;
-          _context3.next = 7;
+          _context4.next = 7;
           return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').update(item.dataset.id, {
             quantity: currentQuantity + 1
           }));
 
         case 7:
-          _context3.next = 13;
+          _context4.next = 13;
           break;
 
         case 9:
           if (!(action === "decrease")) {
-            _context3.next = 13;
+            _context4.next = 13;
             break;
           }
 
           input.value = currentQuantity - 1;
-          _context3.next = 13;
+          _context4.next = 13;
           return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').update(item.dataset.id, {
             quantity: currentQuantity - 1
           }));
 
         case 13:
         case "end":
-          return _context3.stop();
+          return _context4.stop();
       }
     }
   });
@@ -191,19 +213,19 @@ function updateQuantity(item, action) {
 
 function calculateItemPrice() {
   var paymentSummary, data, subtotal, shipping, TAX_RATE, tax, total;
-  return regeneratorRuntime.async(function calculateItemPrice$(_context4) {
+  return regeneratorRuntime.async(function calculateItemPrice$(_context5) {
     while (1) {
-      switch (_context4.prev = _context4.next) {
+      switch (_context5.prev = _context5.next) {
         case 0:
           paymentSummary = document.querySelector('.summary-details');
-          _context4.next = 3;
+          _context5.next = 3;
           return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').getFullList({
             filter: "user = \"".concat(getCurrentUser().id, "\""),
             expand: 'product'
           }));
 
         case 3:
-          data = _context4.sent;
+          data = _context5.sent;
           subtotal = 0;
           shipping = 0;
           TAX_RATE = 0.0005;
@@ -219,7 +241,7 @@ function calculateItemPrice() {
 
         case 11:
         case "end":
-          return _context4.stop();
+          return _context5.stop();
       }
     }
   });

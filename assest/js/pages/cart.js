@@ -81,6 +81,14 @@ async function displayCart() {
     }
 }
 
+function DeleteAllCart() {
+   const del = document.getElementById('clear-cart');
+   del.addEventListener('click', async () => {
+       await pb.collection('cart').delete();
+       cartItem.remove();
+   })
+}
+
  function attachEventListeners(item) {
     item.addEventListener('click', async (e) => {
         const btn = e.target.closest('button');
