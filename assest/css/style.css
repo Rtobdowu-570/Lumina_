@@ -12,6 +12,10 @@ body {
   line-height: 1.6;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --primary-color: #ff6b6b;
   --secondary-color: #0b0b0d;

@@ -85,9 +85,8 @@ class ProductCard {
       const action = btn ? btn.dataset.action : null;
       if (action === "add-to-cart") {
         e.stopPropagation();
-        this.addToCart();
+        this.addToCart(element);
       } else if (action === "whitelist") {
-        e.stopPropagation();
         this.whitelist(element);
       } else {
         window.location.href = `product-detail.html?id=${this.id}`;
@@ -95,7 +94,11 @@ class ProductCard {
     });
   }
 
-  async addToCart() {
+addToCart(element) {
+    const add = element.querySelector(".btn-icon");
+
+    add.addEventListener("click", async () => {
+      
     if(!pb.authStore.isValid) {
       this.showToast("Please login to add items to cart");
       window.location.href = '/auth/login.html';
@@ -130,27 +133,37 @@ class ProductCard {
       catch(err){
       console.error("Error adding to cart:", err);
     }
+    })
   }
 
-  whitelist(cardElement) {
+  async whitelist(cardElement) {
    this.isWhitelisted = !this.isWhitelisted;
     const btn = cardElement.querySelector(".whitelist-btn");
+    const userId = getCurrentUser().id
     btn.textContent = this.isWhitelisted ? "♥" : "♡";
     btn.classList.toggle("active", this.isWhitelisted);
-    this.showToast(this.isWhitelisted ? "Added to Whitelist" : "Removed from Whitelist");
+    try{
+    if(this.isWhitelisted) {
+      await pb.collection('products').update(this.id, {
+        "whitelisted_by+": userId
+      })
+      this.showToast("Added to Whitelist");
+    } else {
+      await pb.collection('products').update(this.id, {
+                "whitelisted_by-": user.id
+            });
+      this.showToast("Removed from Whitelist");
+    }
+  } catch(err){
+    console.error("Error adding to cart:", err.message);
   }
 
-  toggleWhitelist(element) {
-    if (!element) return;
-    
-    this.isWhitelisted = !this.isWhitelisted;
-    const btn = element.querySelector(".whitelist-btn");
-    btn.textContent = this.isWhitelisted ? "♥" : "♡";
-    btn.classList.toggle("active", this.isWhitelisted);
-    this.showToast(
-      this.isWhitelisted ? "Added to Whitelist" : "Removed from Whitelist",
-    );
+    function getCurrentUser() {
+    return pb.authStore.model;
+}
   }
+
+  
 
   showToast(message) {
     const toast = document.createElement("div");
