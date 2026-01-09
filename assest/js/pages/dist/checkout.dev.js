@@ -128,4 +128,8 @@ options.forEach(function (option) {
     }
   });
 });
+var goBack = document.querySelector('.return');
+goBack.addEventListener('click', function () {
+  window.location.href = '/public/cart.html';
+});
 //# sourceMappingURL=checkout.dev.js.map

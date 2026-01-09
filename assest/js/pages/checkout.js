@@ -112,3 +112,8 @@ options.forEach(option => {
         }
     })
 })
+
+const goBack = document.querySelector('.return');
+goBack.addEventListener('click', () => {
+    window.location.href = '/public/cart.html';
+})
