@@ -203,29 +203,29 @@
                     <section class="form-section">
                         <h2>Shipping Method</h2>
                         <div class="shipping-options">
-                            <label class="shipping-option active">
-                                <input type="radio" name="shipping" checked>
+                            <label class="shipping-option active" data-fee="Standard">
+                                <input type="radio" name="shipping" checked >
                                 <div class="option-content">
                                     <span class="option-title">Standard Shipping</span>
                                     <span class="option-desc">Delivery in 5-7 business days</span>
                                 </div>
-                                <span class="option-price">0.01% of Product Price</span>
+                                <span class="option-price">0.001% of Product Price</span>
                             </label>
-                            <label class="shipping-option">
+                            <label class="shipping-option" data-fee="Express">
                                 <input type="radio" name="shipping">
                                 <div class="option-content">
                                     <span class="option-title">Express Shipping</span>
                                     <span class="option-desc">Delivery in 2-3 business days</span>
                                 </div>
-                                <span class="option-price">0.04% of Product Price</span>
+                                <span class="option-price">0.004% of Product Price</span>
                             </label>
-                            <label class="shipping-option">
+                            <label class="shipping-option" data-fee="Overnight">
                                 <input type="radio" name="shipping">
                                 <div class="option-content">
                                     <span class="option-title">Overnight Shipping</span>
                                     <span class="option-desc">Delivery next business day</span>
                                 </div>
-                                <span class="option-price">0.07% of Product Price</span>
+                                <span class="option-price">0.007% of Product Price</span>
                             </label>
                         </div>
                     </section>
@@ -292,43 +292,27 @@
                 <div class="checkout-summary">
                     <h3>Order Summary</h3>
                     
-                    <div class="order-items">
-                        <div class="order-item">
-                            <div class="item-info">
-                                <span class="item-name">Premium Laptop Pro 15"</span>
-                                <span class="item-qty">Qty: 1</span>
-                            </div>
-                            <span class="item-price">$1,299.99</span>
-                        </div>
-                        <div class="order-item">
-                            <div class="item-info">
-                                <span class="item-name">Wireless Headphones</span>
-                                <span class="item-qty">Qty: 1</span>
-                            </div>
-                            <span class="item-price">$199.99</span>
-                        </div>
-                    </div>
-
+                    <div class="order-items"></div>
                     <div class="order-divider"></div>
 
                     <div class="summary-row">
                         <span class="summary-label">Subtotal</span>
-                        <span class="summary-value">$1,499.98</span>
+                        <span class="summary-value first"></span>
                     </div>
-                    <div class="summary-row">
+                    <div class="summary-row ">
                         <span class="summary-label">Shipping</span>
-                        <span class="summary-value">FREE</span>
+                        <span class="summary-value second"></span>
                     </div>
                     <div class="summary-row">
                         <span class="summary-label">Tax</span>
-                        <span class="summary-value">$119.99</span>
+                        <span class="summary-value third"></span>
                     </div>
 
                     <div class="order-divider"></div>
 
                     <div class="summary-row total">
                         <span class="summary-label">Total</span>
-                        <span class="summary-value">$1,619.97</span>
+                        <span class="summary-value last"></span>
                     </div>
 
                     <div class="promo-code">

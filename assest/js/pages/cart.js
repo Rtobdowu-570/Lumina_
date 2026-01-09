@@ -121,14 +121,18 @@ async function calculateItemPrice() {
     });
 
     let subtotal = 0;
-    data.forEach(pd => {
-        const paymentData = pd.expand.product;
-        subtotal += pd.quantity * paymentData.price;
-    });
+    let shipping = 0;
+    const TAX_RATE = 0.0005;
 
-    const shipping = subtotal * 0.01;
-    const tax = (subtotal * 0.01) * 0.05;
-    const total = subtotal + shipping + tax;
+data.forEach(pd => {
+  const product = pd.expand.product;
+  const itemTotal = product.price * pd.quantity;
+  subtotal += itemTotal;
+  shipping += product.price * 0.001 * pd.quantity;
+});
+
+const tax = subtotal * TAX_RATE;
+const total = subtotal + shipping + tax;
 
     paymentSummary.innerHTML = 
     `

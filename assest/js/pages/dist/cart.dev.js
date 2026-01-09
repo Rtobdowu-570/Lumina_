@@ -190,7 +190,7 @@ function updateQuantity(item, action) {
 }
 
 function calculateItemPrice() {
-  var paymentSummary, data, subtotal, shipping, tax, total;
+  var paymentSummary, data, subtotal, shipping, TAX_RATE, tax, total;
   return regeneratorRuntime.async(function calculateItemPrice$(_context4) {
     while (1) {
       switch (_context4.prev = _context4.next) {
@@ -205,16 +205,19 @@ function calculateItemPrice() {
         case 3:
           data = _context4.sent;
           subtotal = 0;
+          shipping = 0;
+          TAX_RATE = 0.0005;
           data.forEach(function (pd) {
-            var paymentData = pd.expand.product;
-            subtotal += pd.quantity * paymentData.price;
+            var product = pd.expand.product;
+            var itemTotal = product.price * pd.quantity;
+            subtotal += itemTotal;
+            shipping += product.price * 0.001 * pd.quantity;
           });
-          shipping = subtotal * 0.01;
-          tax = subtotal * 0.01 * 0.05;
+          tax = subtotal * TAX_RATE;
           total = subtotal + shipping + tax;
           paymentSummary.innerHTML = "\n        <div class=\"summary-row\">\n            <span>Subtotal (<span id=\"total-items\">".concat(data.length, "</span> ").concat(data.length > 1 ? 'items' : 'item', ")</span>\n            <span id=\"subtotal\">$").concat(subtotal.toFixed(2), "</span>\n        </div>\n        <div class=\"summary-row\">\n            <span>Shipping</span>\n            <span id=\"shipping\">$").concat(shipping.toFixed(2), "</span>\n        </div>\n        <div class=\"summary-row\">\n            <span>Tax</span>\n            <span id=\"tax\">$").concat(tax.toFixed(2), "</span>\n        </div>\n        <div class=\"summary-row discount\" id=\"discount-row\" style=\"display: none\">\n            <span>Discount</span>\n            <span id=\"discount\">-$0.00</span>\n        </div>\n        <div class=\"summary-divider\"></div>\n        <div class=\"summary-row total\">\n            <span>Total</span>\n            <span id=\"total\">$").concat(total.toFixed(2), "</span>\n        </div>\n    ");
 
-        case 10:
+        case 11:
         case "end":
           return _context4.stop();
       }
