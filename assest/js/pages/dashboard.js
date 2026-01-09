@@ -1,5 +1,5 @@
 import { pb, isAuthenticated } from '../api/pocketbase.js';
-
+import { ProductCard } from "../components/product-card.js";
 // prevent user from viewing dashboard if not logged in
 function checkAuth() {
     if (!isAuthenticated()) {
@@ -115,11 +115,53 @@ async function displayUserOrder() {
     orderContainer.appendChild(row);
 }
 
+async function displayWhitelstedItems() {
+    const whitelist = document.querySelector('.whitelist-items');
+    whitelist.innerHTML ='';
+
+    const userId = getCurrentUser().id;
+    const whitelistedItems = await pb.collection('products').getFullList({
+        filter: `whitelisted_by ~ "${getCurrentUser().id}"`
+    }); 
+
+    whitelistedItems.forEach(item => {
+        const image = item.image ? pb.files.getURL(item, item.image) : '/assest/images/placeholder.png';
+        
+        whitelist.innerHTML += `
+        <div class="product-card-home">
+        <a href="product-detail.html?id=${item.id}" class="product-image-home">
+          <img src= "${image}" alt="${item.name}" />
+        </a>
+        <div class="product-info-home">
+          <span class="product-category-home">${item.category}</span>
+          <h3 class="product-name-home">${item.name}</h3>
+          <div class="product-footer-home">
+            <button class="btn-icon" aria-label="Add to cart" data-action="add-to-cart">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M2 2H3.5L4.5 4M4.5 4L6.5 14H16.5L18.5 6H4.5Z" stroke="currentColor" stroke-width="2"/>
+                <circle cx="7" cy="18" r="1" fill="currentColor"/>
+                <circle cx="16" cy="18" r="1" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+        `
+
+        const addToCartBtn = whitelist.querySelector(`[data-action="add-to-cart"]`);
+        addToCartBtn.addEventListener('click', () => {
+            const productCard = new ProductCard();
+            productCard.addToCart(item);
+        });
+    })
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     displayUsername();
     displayUserData();
     displayUserOrder();
+    displayWhitelstedItems();
 });
 
 export { logOut, getCurrentUser, checkAuth, displayUsername };

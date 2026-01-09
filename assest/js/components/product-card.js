@@ -1,4 +1,4 @@
-import { pb } from "../api/pocketbase.js";
+import { getCurrentUser, pb } from "../api/pocketbase.js";
 class ProductCard {
   constructor(product) {
     if (!product) return;
@@ -85,8 +85,10 @@ class ProductCard {
       const action = btn ? btn.dataset.action : null;
       if (action === "add-to-cart") {
         e.stopPropagation();
+        e.stopPropagation();
         this.addToCart(element);
       } else if (action === "whitelist") {
+        e.stopPropagation();
         this.whitelist(element);
       } else {
         window.location.href = `product-detail.html?id=${this.id}`;
@@ -94,47 +96,37 @@ class ProductCard {
     });
   }
 
-addToCart(element) {
-    const add = element.querySelector(".btn-icon");
+async addToCart() {
+  if (!pb.authStore.isValid) {
+    this.showToast("Please login to add items to cart");
+    setTimeout(() => { window.location.href = '/auth/login.html'; }, 1000);
+    return;
+  }
 
-    add.addEventListener("click", async () => {
-      
-    if(!pb.authStore.isValid) {
-      this.showToast("Please login to add items to cart");
-      window.location.href = '/auth/login.html';
-      return;
-    }
+  try {
+    const userId = getCurrentUser().id;
+    const existing = await pb.collection('cart').getFirstListItem(
+      `user="${userId}" && product="${this.id}"`
+    ).catch(() => null);
 
-    try{
-      const data = {
-            "user": pb.authStore.model.id,
-            "product": this.id,
-            "quantity": 1
-      }
-
-      const existing = await pb.collection('cart').getFirstListItem(
-            `user="${pb.authStore.model.id}" && product="${this.id}"`
-        ).catch(() => null)
-    
-
-    if(existing) {
+    if (existing) {
       await pb.collection('cart').update(existing.id, {
-                "quantity": existing.quantity + 1
-            });
+        "quantity": existing.quantity + 1
+      });
+    } else {
+      await pb.collection('cart').create({
+        "user": userId,
+        "product": this.id,
+        "quantity": 1
+      });
     }
-    else {
-      await pb.collection('cart').create(data);
-    }
+
     this.showToast("Added to cart!");
-    window.dispatchEvent(
-      new CustomEvent("product-added-to-cart", { detail: this }),
-    );
+    window.dispatchEvent(new CustomEvent("product-added-to-cart", { detail: this }));
+  } catch (err) {
+    console.error("Error adding to cart:", err);
   }
-      catch(err){
-      console.error("Error adding to cart:", err);
-    }
-    })
-  }
+}
 
   async whitelist(cardElement) {
    this.isWhitelisted = !this.isWhitelisted;
@@ -150,20 +142,19 @@ addToCart(element) {
       this.showToast("Added to Whitelist");
     } else {
       await pb.collection('products').update(this.id, {
-                "whitelisted_by-": user.id
+                "whitelisted_by-": userId
             });
       this.showToast("Removed from Whitelist");
     }
   } catch(err){
-    console.error("Error adding to cart:", err.message);
+        this.isWhitelisted = !this.isWhitelisted;
+        btn.textContent = this.isWhitelisted ? "♥" : "♡";
+        btn.classList.toggle("active", this.isWhitelisted);
+        
+        console.error("Whitelist Error:", err.message);
+        this.showToast("Failed to update whitelist");
   }
-
-    function getCurrentUser() {
-    return pb.authStore.model;
-}
   }
-
-  
 
   showToast(message) {
     const toast = document.createElement("div");
@@ -175,5 +166,6 @@ addToCart(element) {
     }, 2000);
   }
 }
+
 
 export { ProductCard };

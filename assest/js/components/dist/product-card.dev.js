@@ -78,9 +78,12 @@ function () {
 
         if (action === "add-to-cart") {
           e.stopPropagation();
+          e.stopPropagation();
 
           _this.addToCart(element);
         } else if (action === "whitelist") {
+          e.stopPropagation();
+
           _this.whitelist(element);
         } else {
           window.location.href = "product-detail.html?id=".concat(_this.id);
@@ -89,139 +92,134 @@ function () {
     }
   }, {
     key: "addToCart",
-    value: function addToCart(element) {
-      var _this2 = this;
+    value: function addToCart() {
+      var userId, existing;
+      return regeneratorRuntime.async(function addToCart$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              if (_pocketbase.pb.authStore.isValid) {
+                _context.next = 4;
+                break;
+              }
 
-      var add = element.querySelector(".btn-icon");
-      add.addEventListener("click", function _callee() {
-        var data, existing;
-        return regeneratorRuntime.async(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                if (_pocketbase.pb.authStore.isValid) {
-                  _context.next = 4;
-                  break;
-                }
-
-                _this2.showToast("Please login to add items to cart");
-
+              this.showToast("Please login to add items to cart");
+              setTimeout(function () {
                 window.location.href = '/auth/login.html';
-                return _context.abrupt("return");
+              }, 1000);
+              return _context.abrupt("return");
 
-              case 4:
-                _context.prev = 4;
-                data = {
-                  "user": _pocketbase.pb.authStore.model.id,
-                  "product": _this2.id,
-                  "quantity": 1
-                };
-                _context.next = 8;
-                return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').getFirstListItem("user=\"".concat(_pocketbase.pb.authStore.model.id, "\" && product=\"").concat(_this2.id, "\""))["catch"](function () {
-                  return null;
-                }));
+            case 4:
+              _context.prev = 4;
+              userId = (0, _pocketbase.getCurrentUser)().id;
+              _context.next = 8;
+              return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').getFirstListItem("user=\"".concat(userId, "\" && product=\"").concat(this.id, "\""))["catch"](function () {
+                return null;
+              }));
 
-              case 8:
-                existing = _context.sent;
+            case 8:
+              existing = _context.sent;
 
-                if (!existing) {
-                  _context.next = 14;
-                  break;
-                }
-
-                _context.next = 12;
-                return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').update(existing.id, {
-                  "quantity": existing.quantity + 1
-                }));
-
-              case 12:
-                _context.next = 16;
+              if (!existing) {
+                _context.next = 14;
                 break;
+              }
 
-              case 14:
-                _context.next = 16;
-                return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').create(data));
+              _context.next = 12;
+              return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').update(existing.id, {
+                "quantity": existing.quantity + 1
+              }));
 
-              case 16:
-                _this2.showToast("Added to cart!");
+            case 12:
+              _context.next = 16;
+              break;
 
-                window.dispatchEvent(new CustomEvent("product-added-to-cart", {
-                  detail: _this2
-                }));
-                _context.next = 23;
-                break;
+            case 14:
+              _context.next = 16;
+              return regeneratorRuntime.awrap(_pocketbase.pb.collection('cart').create({
+                "user": userId,
+                "product": this.id,
+                "quantity": 1
+              }));
 
-              case 20:
-                _context.prev = 20;
-                _context.t0 = _context["catch"](4);
-                console.error("Error adding to cart:", _context.t0);
+            case 16:
+              this.showToast("Added to cart!");
+              window.dispatchEvent(new CustomEvent("product-added-to-cart", {
+                detail: this
+              }));
+              _context.next = 23;
+              break;
 
-              case 23:
-              case "end":
-                return _context.stop();
-            }
+            case 20:
+              _context.prev = 20;
+              _context.t0 = _context["catch"](4);
+              console.error("Error adding to cart:", _context.t0);
+
+            case 23:
+            case "end":
+              return _context.stop();
           }
-        }, null, null, [[4, 20]]);
-      });
+        }
+      }, null, this, [[4, 20]]);
     }
   }, {
     key: "whitelist",
     value: function whitelist(cardElement) {
-      var btn, userId, getCurrentUser;
+      var btn, userId;
       return regeneratorRuntime.async(function whitelist$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              getCurrentUser = function _ref() {
-                return _pocketbase.pb.authStore.model;
-              };
-
               this.isWhitelisted = !this.isWhitelisted;
               btn = cardElement.querySelector(".whitelist-btn");
-              userId = getCurrentUser().id;
+              userId = (0, _pocketbase.getCurrentUser)().id;
               btn.textContent = this.isWhitelisted ? "♥" : "♡";
               btn.classList.toggle("active", this.isWhitelisted);
-              _context2.prev = 6;
+              _context2.prev = 5;
 
               if (!this.isWhitelisted) {
-                _context2.next = 13;
+                _context2.next = 12;
                 break;
               }
 
-              _context2.next = 10;
+              _context2.next = 9;
               return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').update(this.id, {
                 "whitelisted_by+": userId
               }));
 
-            case 10:
+            case 9:
               this.showToast("Added to Whitelist");
-              _context2.next = 16;
+              _context2.next = 15;
               break;
 
-            case 13:
-              _context2.next = 15;
+            case 12:
+              _context2.next = 14;
               return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').update(this.id, {
-                "whitelisted_by-": user.id
+                "whitelisted_by-": userId
               }));
 
-            case 15:
+            case 14:
               this.showToast("Removed from Whitelist");
 
-            case 16:
-              _context2.next = 21;
+            case 15:
+              _context2.next = 24;
               break;
 
-            case 18:
-              _context2.prev = 18;
-              _context2.t0 = _context2["catch"](6);
-              console.error("Error adding to cart:", _context2.t0.message);
+            case 17:
+              _context2.prev = 17;
+              _context2.t0 = _context2["catch"](5);
+              this.isWhitelisted = !this.isWhitelisted;
+              btn.textContent = this.isWhitelisted ? "♥" : "♡";
+              btn.classList.toggle("active", this.isWhitelisted);
+              console.error("Whitelist Error:", _context2.t0.message);
+              this.showToast("Failed to update whitelist");
 
-            case 21:
+            case 24:
             case "end":
               return _context2.stop();
           }
         }
-      }, null, this, [[6, 18]]);
+      }, null, this, [[5, 17]]);
     }
   }, {
     key: "showToast",

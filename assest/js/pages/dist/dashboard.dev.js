@@ -10,6 +10,8 @@ exports.displayUsername = displayUsername;
 
 var _pocketbase = require("../api/pocketbase.js");
 
+var _productCard = require("../components/product-card.js");
+
 // prevent user from viewing dashboard if not logged in
 function checkAuth() {
   if (!(0, _pocketbase.isAuthenticated)()) {
@@ -154,10 +156,45 @@ function displayUserOrder() {
   });
 }
 
+function displayWhitelstedItems() {
+  var whitelist, userId, whitelistedItems;
+  return regeneratorRuntime.async(function displayWhitelstedItems$(_context3) {
+    while (1) {
+      switch (_context3.prev = _context3.next) {
+        case 0:
+          whitelist = document.querySelector('.whitelist-items');
+          whitelist.innerHTML = '';
+          userId = getCurrentUser().id;
+          _context3.next = 5;
+          return regeneratorRuntime.awrap(_pocketbase.pb.collection('products').getFullList({
+            filter: "whitelisted_by ~ \"".concat(getCurrentUser().id, "\"")
+          }));
+
+        case 5:
+          whitelistedItems = _context3.sent;
+          whitelistedItems.forEach(function (item) {
+            var image = item.image ? _pocketbase.pb.files.getURL(item, item.image) : '/assest/images/placeholder.png';
+            whitelist.innerHTML += "\n        <div class=\"product-card-home\">\n        <a href=\"product-detail.html?id=".concat(item.id, "\" class=\"product-image-home\">\n          <img src= \"").concat(image, "\" alt=\"").concat(item.name, "\" />\n        </a>\n        <div class=\"product-info-home\">\n          <span class=\"product-category-home\">").concat(item.category, "</span>\n          <h3 class=\"product-name-home\">").concat(item.name, "</h3>\n          <div class=\"product-footer-home\">\n            <button class=\"btn-icon\" aria-label=\"Add to cart\" data-action=\"add-to-cart\">\n            <svg width=\"20\" height=\"20\" viewBox=\"0 0 20 20\" fill=\"none\">\n                <path d=\"M2 2H3.5L4.5 4M4.5 4L6.5 14H16.5L18.5 6H4.5Z\" stroke=\"currentColor\" stroke-width=\"2\"/>\n                <circle cx=\"7\" cy=\"18\" r=\"1\" fill=\"currentColor\"/>\n                <circle cx=\"16\" cy=\"18\" r=\"1\" fill=\"currentColor\"/>\n              </svg>\n            </button>\n          </div>\n        </div>\n      </div>\n        ");
+            var addToCartBtn = whitelist.querySelector("[data-action=\"add-to-cart\"]");
+            addToCartBtn.addEventListener('click', function () {
+              var productCard = new _productCard.ProductCard();
+              productCard.addToCart(item);
+            });
+          });
+
+        case 7:
+        case "end":
+          return _context3.stop();
+      }
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   checkAuth();
   displayUsername();
   displayUserData();
   displayUserOrder();
+  displayWhitelstedItems();
 });
 //# sourceMappingURL=dashboard.dev.js.map
